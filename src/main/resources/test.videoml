@@ -1,0 +1,28 @@
+application multiStateAlarm
+
+ digitalSensor button : 9
+ digitalActuator led : 11
+ digitalActuator buzzer : 12
+
+ -> initial {
+     led <= LOW
+     buzzer <= LOW
+     => buzzerOn {
+         button is HIGH
+     }
+ }
+
+ buzzerOn {
+     buzzer <= HIGH
+     => ledOn {
+         button is HIGH
+     }
+ }
+
+ ledOn {
+     led <= HIGH
+     buzzer <= LOW
+     => initial {
+         button is HIGH
+     }
+ }
