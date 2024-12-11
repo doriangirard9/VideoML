@@ -1,0 +1,31 @@
+Project Holidays
+
+import first_clip "first_clip.mp4"
+import second_clip "second_clip.mp4"
+
+create text intro_title {
+    text is "Paris, 20/12/24",
+    size is 40,
+    position is center center,
+    font is Arial,
+    color is white
+}
+
+create text end_sentence {
+    text -> "Thanks for watching !",
+    size -> 30,
+    position -> center center,
+    font -> Arial,
+    color -> white
+}
+
+create background text_background {
+    color -> black
+}
+
+add text_background
+add intro_title lasts 10s
+add first_clip 5s before intro_title
+add second_clip 5s after intro_title
+add text_background after second_clip lasts 15s
+add end_sentence
