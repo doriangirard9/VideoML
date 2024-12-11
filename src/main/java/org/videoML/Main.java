@@ -4,7 +4,11 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.videoML.kernel.Video;
+import org.videoML.kernel.generator.ToWiring;
+import org.videoML.kernel.generator.Visitor;
 import org.videoML.videoml.grammar.ModelBuilder;
+import org.videoML.videoml.grammar.StopErrorListener;
 import videoml.grammar.VideoMLLexer;
 import videoml.grammar.VideoMLParser;
 
@@ -19,11 +23,8 @@ public class Main {
 
         CharStream stream = getCharStream(args);
 
-        // print CharStream
-        System.out.println("stream : " + stream.toString());
-
-        buildModel(stream);
-        // exportToCode(theApp);
+        Video video = buildModel(stream);
+        exportToCode(video);
     }
 
     private static CharStream getCharStream(String[] args) throws IOException {
@@ -34,21 +35,27 @@ public class Main {
         return CharStreams.fromPath(input);
     }
 
-    private static void buildModel(CharStream stream) {
+    private static Video buildModel(CharStream stream) {
         VideoMLLexer    lexer   = new VideoMLLexer(stream);
         lexer.removeErrorListeners();
-        // lexer.addErrorListener(new StopErrorListener());
+        lexer.addErrorListener(new StopErrorListener());
 
         VideoMLParser   parser  = new VideoMLParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners();
-        // parser.addErrorListener(new StopErrorListener());
+        parser.addErrorListener(new StopErrorListener());
 
         ParseTreeWalker walker  = new ParseTreeWalker();
         ModelBuilder      builder = new ModelBuilder();
 
         walker.walk(builder, parser.root()); // parser.root() is the entry point of the grammar
 
-        return;
+        return builder.retrieve();
+    }
+
+    private static void exportToCode(Video video) {
+        Visitor codeGenerator = new ToWiring();
+        video.accept(codeGenerator);
+        System.out.println(codeGenerator.getResult());
     }
 
 }

@@ -9,14 +9,15 @@ root            :   declaration sources EOF;
 declaration     :   'project' name=IDENTIFIER;
 
 sources         :   source+;
-    source             :   'import' name=IDENTIFIER path=PATH;
+    source             :   'import' name=IDENTIFIER path=STRING;
 
 /*****************
  ** Lexer rules **
  *****************/
 
-PATH            :   (LOWERCASE | UPPERCASE)+;
-IDENTIFIER      :   LOWERCASE (LOWERCASE|UPPERCASE)+;
+STRING          :   '"' (LOWERCASE | UPPERCASE | DIGIT | '/' | '.' | '_')+ '"';
+IDENTIFIER      :   (LOWERCASE | UPPERCASE | DIGIT | '_')+;
+DIGIT           :   [0-9];
 INTEGER         :   [0-9]+;
 FLOAT           :   [0-9]+ '.' [0-9]+;
 
