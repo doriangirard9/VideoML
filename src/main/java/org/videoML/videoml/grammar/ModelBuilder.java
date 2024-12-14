@@ -1,6 +1,7 @@
 package org.videoML.videoml.grammar;
 
 import org.videoML.kernel.Video;
+import org.videoML.kernel.clips.VideoClip;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
 
@@ -38,5 +39,8 @@ public class ModelBuilder extends VideoMLBaseListener {
     public void enterSource(VideoMLParser.SourceContext ctx) {
         System.out.println("Source name is : " + ctx.name.getText());
         System.out.println("Source path is : " + ctx.path.getText());
+        if (ctx.path.getText().contains(".mp4")) {
+            video.addClip(new VideoClip(ctx.name.getText(), ctx.path.getText()));
+        }
     }
 }
