@@ -12,20 +12,24 @@ create text intro_title {
 }
 
 create text end_sentence {
-    text -> "Thanks for watching !",
-    size -> 30,
-    position -> center center,
-    font -> Arial,
-    color -> white
+    text is "Thanks for watching !",
+    size is 30,
+    position is center center,
+    font is Arial,
+    color is white
 }
 
-create background text_background {
-    color -> black
+create background intro_background {
+    color is black
 }
 
-add text_background
+create background end_background {
+    color is black
+}
+
+add intro_background lasts 10s
 add intro_title lasts 10s
-add first_clip 5s before intro_title
-add second_clip 5s after intro_title
-add text_background after second_clip lasts 15s
-add end_sentence
+add first_clip after intro_title
+add second_clip after first_clip
+add end_background after second_clip lasts 15s
+add end_sentence after second_clip lasts 15s
