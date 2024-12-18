@@ -1,0 +1,17 @@
+/*
+José wants to add oral explanation to a video (possibly made up with the concatenation of various small clips).
+For that he recorded several small explanations, and he wants to synchronize them with the video.
+He would also like to be able to adjust the volume of each audio chunk, but this is not mandatory.
+*/
+
+Project Sound
+
+concatenate "explanation1.mp3" and "explanation2.mp3" as "explanations"
+concatenate "explanation3.mp3" and "explanation4.mp3" as "explanations2"
+
+overlay "explanations" on "video.mp4" at 00:00:00 as "video_with_explanations"
+overlay "explanations2" on "video_with_explanations" at 00:00:30
+
+adjust volume of "explanation1.mp3" to 50
+adjust volume of "explanation2.mp3" to 70
+adjust volume of "explanation3.mp3" to 80

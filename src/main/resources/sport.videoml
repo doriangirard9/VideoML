@@ -1,0 +1,13 @@
+/*
+Bob wants to show himself commenting a specific sport sequence. So he wants to add a video
+of himself commenting a scene in a corner of the main video. Additionally, he wants to add fade out
+fade in transitions when creating the scene to be commented. Of course the fade effect does not affect
+the video of himself, which stay in the corner.
+*/
+
+Project Sport
+
+stack "comment.mp4" on "sport.mp4" at (top, left) scale 0.5 as "commentary"
+
+transition "fadeIn" on commentary duration 2s
+transition "fadeOut" on commentary duration 2s
