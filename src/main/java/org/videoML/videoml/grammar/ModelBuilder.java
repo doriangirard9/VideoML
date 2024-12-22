@@ -1,6 +1,9 @@
 package org.videoML.videoml.grammar;
 
 import org.videoML.kernel.Video;
+import org.videoML.kernel.Caption;
+
+import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.VideoClip;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
@@ -13,7 +16,6 @@ public class ModelBuilder extends VideoMLBaseListener {
         if (built) { return video; }
         throw new RuntimeException("Cannot retrieve a model that was not created!");
     }
-
 
     @Override
     public void enterRoot(VideoMLParser.RootContext ctx) {
@@ -29,18 +31,30 @@ public class ModelBuilder extends VideoMLBaseListener {
     }
 
     @Override
-    public void enterDeclaration(VideoMLParser.DeclarationContext ctx) {
-        System.out.println("Project name is : " + ctx.name.getText());
-        video.setName(ctx.name.getText());
+    public void enterProjectName(VideoMLParser.ProjectNameContext ctx) {
+        System.out.println("Project name is: " + ctx.IDENTIFIER().getText());
+        video.setName(ctx.IDENTIFIER().getText());
     }
 
+    @Override
+    public void enterCaption(VideoMLParser.CaptionContext ctx) {
+        String text = ctx.STRING().getText().replace("\"", "");
+        int duration = Integer.parseInt(ctx.duration().time().getText().replace("s", ""));
+
+        System.out.println("Adding caption: " + text + " for " + duration + " seconds");
+        Caption caption = new Caption(text, duration);
+        video.addCaption(caption);
+    }
 
     @Override
-    public void enterSource(VideoMLParser.SourceContext ctx) {
-        System.out.println("Source name is : " + ctx.name.getText());
-        System.out.println("Source path is : " + ctx.path.getText());
-        if (ctx.path.getText().contains(".mp4")) {
-            video.addClip(new VideoClip(ctx.name.getText(), ctx.path.getText()));
+    public void enterCombine(VideoMLParser.CombineContext ctx) {
+        System.out.println("Combining clips...");
+        for (int i = 0; i < ctx.STRING().size(); i++) {
+            String clipPath = ctx.STRING(i).getText().replace("\"", "");
+            String clipName = clipPath.split("/")[clipPath.split("/").length - 1];
+            System.out.println("Adding clip: " + clipPath);
+            Clip clip = new VideoClip(clipName, clipPath);
+            video.addClip(clip);
         }
     }
 }

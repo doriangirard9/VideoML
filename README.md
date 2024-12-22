@@ -36,5 +36,5 @@ python3 test.py
 ### Using the script
 
 ```bash
-./run.sh test
+./run.sh scenario1
 ```
