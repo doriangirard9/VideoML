@@ -1,23 +1,12 @@
-/*
-Alice needs to do a cast for her work. She needs to:
-(a) add an introduction title on a black background at the beginning for 10 seconds.
-(b) load a first video clip clip1
-(c) create two clips clip1a and clip1b respectively taken from 00:23 to 01:47 min and from 02:01 to 02:21 min.
-(d) add clip1a with a subtitle s1 from the beginning and for 10 seconds, followed by another subtitle starting 30 seconds after the end of the first one and visible for 10 seconds.
-(e) add clip1b with a subtitle starting 5 seconds before clip1b and lasting for 15 seconds.
-(f) add a thanks conclusive text on a fixed background color (let’s say black).
-(g) export the result as a video file
-*/
-
 Project Work
 
 caption "intro" for 10s
 
-cut "clip1.mp4" from 00:23 to 01:47 as "clip1a"
-cut "clip1.mp4" from 02:01 to 02:21 as "clip1b"
+cut "first_clip.mp4" from 10s to 25s as clip1a
+cut "clip2.mp4" from 10s to 55s as clip1b
 
 caption "s1" on clip1a from 0s to 10s
-caption "s2" on clip1a 30s after "s1" for 10s
+caption "s2" on clip1a 5s after "s1" for 10s
 
 caption "s3" on clip1b 5s before clip1b for 15s
 

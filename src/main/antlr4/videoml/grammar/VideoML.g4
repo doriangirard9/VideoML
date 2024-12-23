@@ -19,10 +19,13 @@ statement       : caption
                 | concatenate
                 ;
 
-caption         : 'caption' STRING ('on' IDENTIFIER)? (duration | offset)? ;
+caption         : 'caption' STRING ('on' IDENTIFIER)? (duration | offset | offsetWithDuration)? ;
+
 duration        : 'for' time ;
-offset          : 'from' time 'to' time
-                | NUMBER 's' ('after' STRING | 'before' IDENTIFIER)? ;
+offset          : 'from' from=time 'to' to=time
+                | NUMBER 's' ('after' after=(IDENTIFIER | STRING) | 'before' before=(IDENTIFIER | STRING))? ;
+offsetWithDuration
+    : offset duration ;
 
 combine         : 'combine' STRING ('and' STRING)+ ;
 

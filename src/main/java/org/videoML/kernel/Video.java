@@ -5,10 +5,13 @@ import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Video implements Visitable {
     private String name;
+    private Map<Integer, String> order = new HashMap<>();
     private List<Clip> clips = new ArrayList<>();
     private List<Caption> captions = new ArrayList<>();
 
@@ -37,6 +40,16 @@ public class Video implements Visitable {
     }
     public void addCaption(Caption caption) {
         this.captions.add(caption);
+    }
+
+    public Map<Integer, String> getOrder() {
+        return order;
+    }
+    public void setOrder(Map<Integer, String> order) {
+        this.order = order;
+    }
+    public void addOrder(Integer index, String clipHash) {
+        this.order.put(index, clipHash);
     }
 
     @Override
