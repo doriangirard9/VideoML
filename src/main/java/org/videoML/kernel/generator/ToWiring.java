@@ -1,20 +1,14 @@
 package org.videoML.kernel.generator;
 
+import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.VideoClip;
 import org.videoML.kernel.Caption;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ToWiring extends Visitor<StringBuffer> {
-    enum PASS {ONE, TWO}
-
-    private List<Caption> handledCaptions = new ArrayList<>();
-    private int sumDuration = 0;
-
     public ToWiring() {
         this.result = new StringBuffer();
     }
@@ -25,10 +19,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Video video) {
-        System.out.println("video order size: " + video.getOrder().size());
-        for (int i = 0; i < video.getOrder().size(); i++) {
-            System.out.println("video order: " + video.getOrder().get(i));
-        }
         w("# Code generated from a VideoML script\n");
         w(String.format("# Video name: %s\n", video.getName()) + "\n");
 
@@ -36,146 +26,105 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         w("font = \"./font/font.ttf\"\n\n");
 
-        List<Clip> clips = video.getClips();
-        for (Clip clip : clips) {
-            if (clip instanceof VideoClip) {
-                VideoClip videoClip = (VideoClip) clip;
-                w(String.format("%s = VideoFileClip(\"%s\")\n", videoClip.getName(), videoClip.getPath()));
-            } else if (clip instanceof CutClip) {
-                CutClip cutClip = (CutClip) clip;
-                w(String.format(
-                        "%s = VideoFileClip(\"%s\").subclipped(%s, %s)\n",
-                        cutClip.getName(), cutClip.getSourcePath(), cutClip.getStartTime().replace("s", ""), cutClip.getEndTime().replace("s", "")
-                ));
-            }
-        }
-        w("\n");
-
         w("video_width = 1280\n");
         w("video_height = 720\n\n");
 
         w("final_clips = []\n");
-
-        List<Caption> captions = video.getCaptions();
         int captionIndex = 1;
+        String currentStart = "0";
 
-        // put all the captions that are before the first clip and not relative to any other clip
-        for (Caption caption : captions) {
-            if (caption.getClipName() == null && caption.getRelativeReference() == null) {
-                w(String.format(
-                        "caption%d = (TextClip(text=\"%s\", font=font, font_size=48, color='white', bg_color='black')"
-                                + ".with_duration(%d)"
-                                + ".resized(width=video_width, height=video_height)"
-                                + ".with_position(('center', 'center'))"
-                                + ".with_start(%d))\n",
-                        captionIndex, caption.getText(), caption.getDuration(), caption.getStartTime()
-                ));
+        for (TimelineElement element : video.getTimeline()) {
+            if (element instanceof Caption) {
+                Caption caption = (Caption) element;
+                String startExpression;
 
-                w(String.format("final_clips.append(caption%d)\n", captionIndex));
-                captionIndex++;
-                handledCaptions.add(caption);
-                sumDuration += caption.getDuration();
-            } else {
-                break;
-            }
-        }
-
-        // put all the clips and their captions
-        for (Clip clip : clips) {
-            String clipName = clip.getName();
-            // add with_start to the clip if it's not the first clip (there is a previous caption for example)
-            if (clip == clips.get(0) && !handledCaptions.isEmpty()) {
-                w(String.format("%s = %s.with_start(%d)\n", clipName, clipName, handledCaptions.get(handledCaptions.size() - 1).getDuration()));
-            } else if (clip != clips.get(0)) {
-                w(String.format("%s = %s.with_start(%s)\n", clipName, clipName, clips.get(clips.indexOf(clip) - 1).getName() + ".end"));
-            }
-            w(String.format("final_clips.append(%s)\n", clipName));
-
-            for (Caption caption : captions) {
-                if (caption.getClipName() != null && caption.getClipName().equals(clip.getName())) {
-                    String startTime = caption.getClipName() != null ? caption.getClipName() + ".start + " + caption.getStartTime() : caption.getStartTime() + "";
-                    int duration = caption.getDuration();
-                    if (caption.getRelativeReference() != null) {
-                        String referenceClip = caption.getRelativeReference();
-                        if (caption.getOffset() > 0) {
-                            startTime = getClipEndTime(referenceClip, video) + " + " + caption.getOffset();
-                        } else {
-                            startTime = getClipStartTime(referenceClip, video) + caption.getOffset();
-                        }
+                if (caption.getClipName() == null) {
+                    // Standalone caption
+                    startExpression = currentStart;
+                } else if (caption.getRelativeReference() != null) {
+                    // Relative reference
+                    String referenceClip = caption.getRelativeReference();
+                    String startTime;
+                    if (caption.getOffset() > 0) {
+                        startTime = getClipEndTime(referenceClip, video) + " + " + caption.getOffset();
+                    } else {
+                        startTime = getClipStartTime(referenceClip, video) + caption.getOffset();
                     }
-                    w(String.format(
-                            "caption%d = (TextClip(text=\"%s\", font=font, font_size=48, color='white', bg_color=%s)"
-                                    + ".with_duration(%d)"
-                                    + ".resized(width=video_width, height=video_height)"
-                                    + ".with_position(('center', 'center'))"
-                                    + ".with_start(%s))\n",
-                            captionIndex, caption.getText(), caption.getClipName() != null ? "None" : "'black'", duration, startTime
-                    ));
-
-                    w(String.format("final_clips.append(caption%d)\n", captionIndex));
-                    captionIndex++;
-                    handledCaptions.add(caption);
+                    startExpression = String.format("%s + %d", startTime, caption.getStartTime());
+                } else {
+                    // Tied to a clip
+                    startExpression = String.format("%s.start + %d", caption.getClipName(), caption.getStartTime());
                 }
-            }
-        }
 
-        // put all the captions that are after the last clip and not relative to any other clip
-        for (Caption caption : captions) {
-            if (caption.getClipName() == null && caption.getRelativeReference() == null && !handledCaptions.contains(caption)) {
                 w(String.format(
-                        "caption%d = (TextClip(text=\"%s\", font=font, font_size=48, color='white', bg_color='black')"
+                        "caption%d = (TextClip(text=\"%s\", font=font, font_size=48, color='white')"
                                 + ".with_duration(%d)"
-                                + ".resized(width=video_width, height=video_height)"
-                                + ".with_position(('center', 'center'))"
+                                + ".with_position('center')"
                                 + ".with_start(%s))\n",
-                        captionIndex, caption.getText(), caption.getDuration(), clips.get(clips.size() - 1).getName() + ".end + " + caption.getStartTime()
+                        captionIndex, caption.getText(), caption.getDuration(), startExpression
                 ));
-
                 w(String.format("final_clips.append(caption%d)\n", captionIndex));
+
+                // Only update currentStart when caption is standalone
+                if (caption.getClipName() == null && caption.getRelativeReference() == null) {
+                    currentStart = String.format("caption%d.end", captionIndex);
+                }
                 captionIndex++;
+            } else if (element instanceof VideoClip) {
+                VideoClip videoClip = (VideoClip) element;
+                w(String.format("%s = VideoFileClip(\"%s\").with_start(%s)\n",
+                        videoClip.getName(), videoClip.getPath(), currentStart));
+                w(String.format("final_clips.append(%s)\n", videoClip.getName()));
+                currentStart = String.format("%s.end", videoClip.getName());
+            } else if (element instanceof CutClip) {
+                CutClip clipCut = (CutClip) element;
+                w(String.format("%s = VideoFileClip(\"%s\").subclipped(%s, %s).with_start(%s)\n",
+                        clipCut.getName(), clipCut.getSourcePath(),
+                        clipCut.getStartTime().replace("s", ""),
+                        clipCut.getEndTime().replace("s", ""),
+                        currentStart));
+                w(String.format("final_clips.append(%s)\n", clipCut.getName()));
+                currentStart = String.format("%s.end", clipCut.getName());
             }
         }
 
-        w("final_clip = CompositeVideoClip(final_clips)\n");
-
+        w("final_clip = CompositeVideoClip(final_clips, size=(video_width, video_height))\n");
         w("final_clip.write_videofile(\"output.mp4\", codec=\"libx264\")\n");
     }
 
-    private String[] generateClipNames(List<Clip> clips) {
-        return clips.stream().map(Clip::getName).toArray(String[]::new);
-    }
-
     private String getClipStartTime(String clipName, Video video) {
-        for (Clip clip : video.getClips()) {
-            if (clip.getName().equals(clipName)) {
-                return clip.getName() + ".start";
+        int captionIndex = 1;
+        for (TimelineElement element : video.getTimeline()) {
+            if (element instanceof Clip) {
+                if (element.getName().equals(clipName)) {
+                    return element.getName() + ".start";
+                }
+            } else if (element instanceof Caption) {
+                Caption caption = (Caption) element;
+                if (clipName.contains(caption.getText())) {
+                    return String.format("caption%d.start", captionIndex);
+                }
+                captionIndex++;
             }
         }
-
-        for (int i = 0; i < video.getCaptions().size(); i++) {
-            Caption caption = video.getCaptions().get(i);
-            if (clipName.contains(caption.getText())) {
-                return "caption" + (i) + ".start";
-            }
-        }
-
         return null;
     }
 
     private String getClipEndTime(String clipName, Video video) {
-        for (Clip clip : video.getClips()) {
-            if (clip.getName().equals(clipName)) {
-                return clip.getName() + ".end";
+        int captionIndex = 1;
+        for (TimelineElement element : video.getTimeline()) {
+            if (element instanceof Clip) {
+                if (element.getName().equals(clipName)) {
+                    return element.getName() + ".end";
+                }
+            } else if (element instanceof Caption) {
+                Caption caption = (Caption) element;
+                if (clipName.contains(caption.getText())) {
+                    return String.format("caption%d.end", captionIndex);
+                }
+                captionIndex++;
             }
         }
-
-        for (int i = 0; i < video.getCaptions().size(); i++) {
-            Caption caption = video.getCaptions().get(i);
-            if (clipName.contains(caption.getText())) {
-                return "caption" + (i) + ".end";
-            }
-        }
-
         return null;
     }
 

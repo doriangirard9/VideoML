@@ -1,19 +1,13 @@
 package org.videoML.kernel;
 
-import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Video implements Visitable {
     private String name;
-    private Map<Integer, String> order = new HashMap<>();
-    private List<Clip> clips = new ArrayList<>();
-    private List<Caption> captions = new ArrayList<>();
+    private List<TimelineElement> timeline = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -22,34 +16,11 @@ public class Video implements Visitable {
         this.name = name;
     }
 
-    public List<Clip> getClips() {
-        return clips;
+    public List<TimelineElement> getTimeline() {
+        return timeline;
     }
-    public void setClips(List<Clip> clips) {
-        this.clips = clips;
-    }
-    public void addClip(Clip clip) {
-        this.clips.add(clip);
-    }
-
-    public List<Caption> getCaptions() {
-        return captions;
-    }
-    public void setCaptions(List<Caption> captions) {
-        this.captions = captions;
-    }
-    public void addCaption(Caption caption) {
-        this.captions.add(caption);
-    }
-
-    public Map<Integer, String> getOrder() {
-        return order;
-    }
-    public void setOrder(Map<Integer, String> order) {
-        this.order = order;
-    }
-    public void addOrder(Integer index, String clipHash) {
-        this.order.put(index, clipHash);
+    public void addTimelineElement(TimelineElement element) {
+        timeline.add(element);
     }
 
     @Override

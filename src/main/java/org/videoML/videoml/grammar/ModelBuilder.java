@@ -48,8 +48,8 @@ public class ModelBuilder extends VideoMLBaseListener {
 
         System.out.println("Cutting clip: " + sourcePath + " from " + startTime + " to " + endTime + " as " + name);
         CutClip cutClip = new CutClip(name, sourcePath, startTime, endTime);
-        video.addClip(cutClip);
-        video.addOrder(video.getOrder().size(), cutClip.hashCode() + "");
+        video.addTimelineElement(cutClip);
+
     }
 
     /*
@@ -118,8 +118,7 @@ public class ModelBuilder extends VideoMLBaseListener {
         );
 
         Caption caption = new Caption(text, clipName, offsetValue, relativeClipOrCaption, duration);
-        video.addCaption(caption);
-        video.addOrder(video.getOrder().size(), caption.hashCode() + "");
+        video.addTimelineElement(caption);
     }
 
     @Override
@@ -130,9 +129,8 @@ public class ModelBuilder extends VideoMLBaseListener {
             String clipName = clipPath.split("/")[clipPath.split("/").length - 1];
             clipName = clipName.substring(0, clipName.lastIndexOf('.'));
             System.out.println("Adding clip: " + clipPath);
-            Clip clip = new VideoClip(clipName, clipPath);
-            video.addClip(clip);
-            video.addOrder(video.getOrder().size(), clip.hashCode() + "");
+            VideoClip clip = new VideoClip(clipName, clipPath);
+            video.addTimelineElement(clip);
         }
     }
 }

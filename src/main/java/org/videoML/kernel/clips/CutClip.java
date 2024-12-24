@@ -1,8 +1,9 @@
 package org.videoML.kernel.clips;
 
+import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.generator.Visitor;
 
-public class CutClip extends Clip {
+public class CutClip extends Clip implements TimelineElement {
     private String sourcePath;
     private String startTime;
     private String endTime;

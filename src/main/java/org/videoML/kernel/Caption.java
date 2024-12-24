@@ -1,6 +1,6 @@
 package org.videoML.kernel;
 
-public class Caption {
+public class Caption implements TimelineElement {
     private String text;
     private int duration;
     private String clipName;
@@ -26,6 +26,11 @@ public class Caption {
         this.offset = offset;
         this.relativeReference = relativeReference;
         this.duration = duration;
+    }
+
+    @Override
+    public String getName() {
+        return text;
     }
 
     public String getText() {
