@@ -1,9 +1,8 @@
 package org.videoML.kernel.clips;
 
-import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.generator.Visitor;
 
-public class VideoClip extends ImportableClip implements TimelineElement {
+public class VideoClip extends ImportableClip {
 
     public VideoClip(String name, String path) {
         this.setName(name);

@@ -1,8 +1,9 @@
 package org.videoML.kernel.clips;
 
+import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.generator.Visitable;
 
-public abstract class Clip implements Visitable {
+public abstract class Clip implements Visitable, TimelineElement {
     private String name;
 
     public String getName() {
