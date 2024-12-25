@@ -31,7 +31,7 @@ combine         : 'combine' STRING ('and' STRING)+ ;
 
 cut             : 'cut' STRING 'from' time 'to' time 'as' IDENTIFIER ;
 
-stack           : 'stack' STRING 'on' STRING 'at' '(' position ',' position ')' ('scale' NUMBER)? 'as' IDENTIFIER ;
+stack           : 'stack' STRING 'on' STRING 'at' '(' position ',' position ')' ('scale' FLOAT)? 'as' IDENTIFIER ;
 
 transition      : 'transition' STRING 'on' IDENTIFIER 'duration' time ;
 
@@ -53,6 +53,7 @@ IDENTIFIER      : [a-zA-Z_][a-zA-Z0-9_]* ;
 STRING          : '"' (~["])* '"' ;
 TIME            : DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ;
 NUMBER          : DIGIT+ ;
+FLOAT           : DIGIT+ '.' DIGIT+ ;
 NEWLINE         : ('\r'? '\n' | '\r')+      -> skip;
 WS              : ((' ' | '\t')+)           -> skip;
 COMMENT         : '#' ~( '\r' | '\n' )*     -> skip;

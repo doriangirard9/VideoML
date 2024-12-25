@@ -4,6 +4,7 @@ import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.CutClip;
+import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.VideoClip;
 import org.videoML.kernel.Caption;
 
@@ -54,6 +55,11 @@ public class ToWiring extends Visitor<StringBuffer> {
     public void visit(VideoClip videoClip) {
         w(String.format("%s = VideoFileClip(\"%s\").with_start(%s)\n",
                 videoClip.getName(), videoClip.getPath(), currentStart));
+
+        for (Transition transition : videoClip.getTransitions()) {
+            this.visit(transition);
+        }
+
         w(String.format("final_clips.append(%s)\n", videoClip.getName()));
         currentStart = String.format("%s.end", videoClip.getName());
     }
@@ -65,6 +71,12 @@ public class ToWiring extends Visitor<StringBuffer> {
                 clipCut.getStartTime().replace("s", ""),
                 clipCut.getEndTime().replace("s", ""),
                 currentStart));
+
+        for (Transition transition : clipCut.getTransitions()) {
+            this.visit(transition);
+        }
+
+
         w(String.format("final_clips.append(%s)\n", clipCut.getName()));
         currentStart = String.format("%s.end", clipCut.getName());
     }
@@ -105,6 +117,27 @@ public class ToWiring extends Visitor<StringBuffer> {
             currentStart = String.format("caption%d.end", captionIndex);
         }
         captionIndex++;
+    }
+
+    @Override
+    public void visit(Transition transition) {
+        String transitionEffect = "";
+        switch (transition.getType()) {
+            case FADEIN:
+                transitionEffect = String.format("vfx.FadeIn(%s)", transition.getDuration());
+                break;
+            case FADEOUT:
+                transitionEffect = String.format("vfx.FadeOut(%s)", transition.getDuration());
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported transition type: " + transition.getType());
+        }
+
+        String targetClip = transition.getTargetClip();
+        if (targetClip != null) {
+            w(String.format("%s = %s.with_effects([%s])\n",
+                    targetClip, targetClip, transitionEffect));
+        }
     }
 
     private String getClipTime(String clipName, Video video, boolean isStartTime) {

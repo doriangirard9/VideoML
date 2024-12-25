@@ -3,7 +3,6 @@ package org.videoML.videoml.grammar;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.Caption;
 
-import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.VideoClip;
 import videoml.grammar.VideoMLBaseListener;
@@ -132,5 +131,40 @@ public class ModelBuilder extends VideoMLBaseListener {
             VideoClip clip = new VideoClip(clipName, clipPath);
             video.addTimelineElement(clip);
         }
+    }
+
+    @Override
+    public void enterStack(VideoMLParser.StackContext ctx) {
+        String overlayPath = ctx.STRING(0).getText().replace("\"", "");
+        String basePath = ctx.STRING(1).getText().replace("\"", "");
+        String position1 = ctx.position(0).getText();
+        String position2 = ctx.position(1).getText();
+        double scale = ctx.FLOAT() != null ? Double.parseDouble(ctx.FLOAT().getText()) : 1.0;
+        String name = ctx.IDENTIFIER().getText();
+
+        System.out.printf(
+                "Stacking clip: %s on %s at (%s, %s) with scale %f as %s%n",
+                overlayPath, basePath, position1, position2, scale, name
+        );
+
+        VideoClip overlayClip = new VideoClip(name, overlayPath);
+        overlayClip.setPosition(position1, position2);
+        overlayClip.setScale(scale);
+
+        video.addTimelineElement(overlayClip);
+    }
+
+    @Override
+    public void enterTransition(VideoMLParser.TransitionContext ctx) {
+        String effectName = ctx.STRING().getText().replace("\"", "");
+        String clipName = ctx.IDENTIFIER().getText();
+        int duration = Integer.parseInt(ctx.time().getText().replace("s", ""));
+
+        System.out.printf(
+                "Applying transition: %s on clip %s with duration %d seconds%n",
+                effectName, clipName, duration
+        );
+
+        video.addTransition(clipName, effectName, duration);
     }
 }
