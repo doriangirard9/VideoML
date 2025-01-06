@@ -7,6 +7,9 @@ import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.VideoClip;
 import org.videoML.kernel.Caption;
+import org.videoML.kernel.effects.Blur;
+import org.videoML.kernel.effects.Effect;
+import org.videoML.kernel.effects.Freeze;
 
 
 public class ToWiring extends Visitor<StringBuffer> {
@@ -60,6 +63,19 @@ public class ToWiring extends Visitor<StringBuffer> {
             this.visit(transition);
         }
 
+        for(Effect effect: videoClip.getEffects()){
+            switch(effect.getEffectName()){
+                case "freeze":
+                    Freeze freeze = (Freeze) effect;
+                    this.visit(freeze);
+                    break;
+                case "blur":
+                    Blur blur = (Blur) effect;
+                    this.visit(blur);
+                    break;
+            }
+        }
+
         w(String.format("final_clips.append(%s)\n", videoClip.getName()));
         currentStart = String.format("%s.end", videoClip.getName());
     }
@@ -74,6 +90,19 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         for (Transition transition : clipCut.getTransitions()) {
             this.visit(transition);
+        }
+
+        for(Effect effect: clipCut.getEffects()){
+            switch(effect.getEffectName()){
+                case "freeze":
+                    Freeze freeze = (Freeze) effect;
+                    this.visit(freeze);
+                    break;
+                case "blur":
+                    Blur blur = (Blur) effect;
+                    this.visit(blur);
+                    break;
+            }
         }
 
 
@@ -138,6 +167,28 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("%s = %s.with_effects([%s])\n",
                     targetClip, targetClip, transitionEffect));
         }
+    }
+
+    @Override
+    public void visit(Freeze freeze) {
+        String targetClip = freeze.getClipName();
+        String freezeEffect = String.format("vfx.Freeze(%s, %s)", freeze.getTimer(), freeze.getDuration());
+
+        if(targetClip != null) {
+            w(String.format("%s = %s.with_effects([%s])\n",
+                    targetClip, targetClip, freezeEffect));
+            // TODO! We need to re-set the start/end timers after applying an effect
+            /*
+            w(String.format("%s = %s.with_start(%s.start).with_end(%s.end)\n",
+                    targetClip, targetClip, targetClip, targetClip));
+             */
+        }
+    }
+
+    @Override
+    public void visit(Blur blur) {
+        // TODO NOT YET IMPLEMENTED
+        return;
     }
 
     private String getClipTime(String clipName, Video video, boolean isStartTime) {

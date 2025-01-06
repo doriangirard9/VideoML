@@ -167,4 +167,25 @@ public class ModelBuilder extends VideoMLBaseListener {
 
         video.addTransition(clipName, effectName, duration);
     }
+
+    @Override
+    public void enterFreeze(VideoMLParser.FreezeContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+
+        String timer = ctx.start.getText().replace("s", "");
+        String duration = ctx.effect_duration.getText().replace("s", "");
+
+        System.out.printf(
+                "Freezing clip: %s at timer %s for %s seconds%n",
+                clipName, timer, duration
+        );
+
+        video.addFreeze(Integer.parseInt(timer), Integer.parseInt(duration), clipName);
+    }
+
+    @Override
+    public void enterBlur(VideoMLParser.BlurContext ctx) {
+        // TODO! NOT YET IMPLEMENTED
+        return;
+    }
 }

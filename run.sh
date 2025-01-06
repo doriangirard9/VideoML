@@ -17,4 +17,4 @@ mvn exec:java -Dexec.args="src/main/resources/$FILE_NAME.videoml"
 
 # Execute the generated code
 cd src/main/resources
-python3 $FILE_NAME.py
+python $FILE_NAME.py

@@ -2,6 +2,9 @@ package org.videoML.kernel.clips;
 
 import org.videoML.kernel.generator.Visitor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VideoClip extends ImportableClip {
     private double scale = 1.0;
     private String positionX = "center";

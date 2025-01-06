@@ -5,6 +5,8 @@ import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.VideoClip;
+import org.videoML.kernel.effects.Blur;
+import org.videoML.kernel.effects.Freeze;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,13 @@ public abstract class Visitor<T> {
     public abstract void visit(Caption caption);
     public abstract void visit(Transition transition);
 
+    /****************************************
+     ** Effects
+     ****************************************/
+
+    public abstract void visit(Freeze freeze);
+    public abstract void visit(Blur blur);
+
     /***********************
      ** Helper mechanisms **
      ***********************/
@@ -29,6 +38,5 @@ public abstract class Visitor<T> {
     public T getResult() {
         return result;
     }
-
 }
 

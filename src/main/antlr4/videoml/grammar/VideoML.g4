@@ -14,6 +14,7 @@ statement       : caption
                 | transition
                 | overlay
                 | adjustVolume
+                | blur
                 | crop
                 | freeze
                 | concatenate
@@ -42,16 +43,18 @@ timestamp        : TIME ;
 
 adjustVolume    : 'adjust' 'volume' 'of' STRING 'to' NUMBER ;
 
+blur            : 'blur' IDENTIFIER 'at' timestamp 'for' time ;
+
 crop            : 'crop' ('top' | 'bottom' | 'left' | 'right') NUMBER '%' ('of' STRING)+ 'as' IDENTIFIER ;
 
-freeze          : 'freeze' IDENTIFIER 'at' timestamp 'for' time ;
+freeze          : 'freeze' IDENTIFIER 'at' start=time 'for' effect_duration=time ;
 
 concatenate     : 'concatenate' STRING ('and' STRING)+ ('as' IDENTIFIER)? ;
 
 // Lexer Rules
 IDENTIFIER      : [a-zA-Z_][a-zA-Z0-9_]* ;
 STRING          : '"' (~["])* '"' ;
-TIME            : DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ;
+TIME            : DIGIT DIGIT ':' DIGIT DIGIT (':' DIGIT DIGIT)? ;
 NUMBER          : DIGIT+ ;
 FLOAT           : DIGIT+ '.' DIGIT+ ;
 NEWLINE         : ('\r'? '\n' | '\r')+      -> skip;
