@@ -18,6 +18,7 @@ public class VideoClip extends ImportableClip {
     public double getScale() {
         return scale;
     }
+
     public void setScale(double scale) {
         this.scale = scale;
     }
@@ -25,9 +26,11 @@ public class VideoClip extends ImportableClip {
     public String getPositionX() {
         return positionX;
     }
+
     public String getPositionY() {
         return positionY;
     }
+
     public void setPosition(String positionX, String positionY) {
         this.positionX = positionX;
         this.positionY = positionY;

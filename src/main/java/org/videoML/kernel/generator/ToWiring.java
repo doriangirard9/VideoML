@@ -56,12 +56,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(VideoClip videoClip) {
+        String startTime = (videoClip.getStartTime() != null) ? videoClip.getStartTime() : currentStart;
         w(String.format("%s = VideoFileClip(\"%s\").with_start(%s)\n",
-                videoClip.getName(), videoClip.getPath(), currentStart));
+            videoClip.getName(), videoClip.getPath(), startTime));
 
         for (Transition transition : videoClip.getTransitions()) {
             this.visit(transition);
         }
+
 
         for(Effect effect: videoClip.getEffects()){
             switch(effect.getEffectName()){

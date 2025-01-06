@@ -10,6 +10,7 @@ import java.util.List;
 public abstract class Clip implements Visitable, TimelineElement {
     private String name;
     private List<Transition> transitions = new ArrayList<>();
+    private String startTime = null;
     private List<Effect> effects = new ArrayList<>();
 
 
@@ -29,6 +30,15 @@ public abstract class Clip implements Visitable, TimelineElement {
     public void removeTransition(Transition transition) {
         transitions.remove(transition);
     }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+}
 
     public List<Effect> getEffects() {
         return effects;
