@@ -209,4 +209,30 @@ public class ModelBuilder extends VideoMLBaseListener {
         // TODO! NOT YET IMPLEMENTED
         return;
     }
+
+    @Override
+    public void enterResize(VideoMLParser.ResizeContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        int scale;
+        int width;
+        int height;
+
+        if (ctx.percentage() != null) {
+            scale = Integer.parseInt(ctx.percentage().getText());
+            width = -1;
+            height = -1;
+        }
+        else {
+            width = Integer.parseInt(ctx.dimensions().width.getText());
+            height = Integer.parseInt(ctx.dimensions().height.getText());
+            scale = -1;
+        }
+
+        System.out.printf(
+                "Resizing clip: %s with scale %d%n",
+                clipName, scale
+        );
+
+        video.addResize(clipName, width, height, scale);
+    }
 }

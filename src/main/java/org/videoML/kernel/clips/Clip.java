@@ -38,7 +38,6 @@ public abstract class Clip implements Visitable, TimelineElement {
     public String getStartTime() {
         return startTime;
     }
-}
 
     public List<Effect> getEffects() {
         return effects;

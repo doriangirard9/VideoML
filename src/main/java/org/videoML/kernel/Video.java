@@ -2,6 +2,7 @@ package org.videoML.kernel;
 
 import org.videoML.kernel.clips.*;
 import org.videoML.kernel.effects.Freeze;
+import org.videoML.kernel.effects.Resize;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
@@ -50,6 +51,42 @@ public class Video implements Visitable {
         if (clip.isPresent()) {
             Freeze freeze = new Freeze(timer, duration, clipName);
             clip.get().addEffect(freeze);
+        } else {
+            throw new RuntimeException("Clip not found: " + clipName);
+        }
+    }
+
+    public void addResize(String clipName, int width, int height, double scale) {
+        System.out.println("ADDING RESIZE EFFECT TO CLIP: " + clipName + " WITH SCALE: " + scale + " AND DIMENSIONS: " + width + "x" + height);
+        Optional<Clip> clip = timeline.stream()
+                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .map(e -> (Clip) e)
+                .findFirst();
+
+        if (clip.isPresent()) {
+            Resize resize;
+            if(width == -1 && height == -1){
+                // Scaled resize, without dimensions
+                resize = new Resize(scale);
+            }
+            else {
+                // Fixed resize, with dimensions
+                resize = new Resize(width, height);
+            }
+            clip.get().addEffect(resize);
+        } else {
+            throw new RuntimeException("Clip not found: " + clipName);
+        }
+    }
+
+    public String getStartTimeForClip(String clipName) {
+        Optional<Clip> clip = timeline.stream()
+                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .map(e -> (Clip) e)
+                .findFirst();
+
+        if (clip.isPresent()) {
+            return clip.get().getStartTime();
         } else {
             throw new RuntimeException("Clip not found: " + clipName);
         }

@@ -10,6 +10,9 @@ import org.videoML.kernel.Caption;
 import org.videoML.kernel.effects.Blur;
 import org.videoML.kernel.effects.Effect;
 import org.videoML.kernel.effects.Freeze;
+import org.videoML.kernel.effects.Resize;
+
+import java.util.Optional;
 
 
 public class ToWiring extends Visitor<StringBuffer> {
@@ -75,6 +78,12 @@ public class ToWiring extends Visitor<StringBuffer> {
                     Blur blur = (Blur) effect;
                     this.visit(blur);
                     break;
+                case "resize":
+                    Resize resize = (Resize) effect;
+                    this.visit(resize);
+                default:
+                    System.err.println("Unsupported effect: " + effect.getEffectName());
+                    System.exit(1);
             }
         }
 
@@ -179,11 +188,9 @@ public class ToWiring extends Visitor<StringBuffer> {
         if(targetClip != null) {
             w(String.format("%s = %s.with_effects([%s])\n",
                     targetClip, targetClip, freezeEffect));
-            // TODO! We need to re-set the start/end timers after applying an effect
-            /*
-            w(String.format("%s = %s.with_start(%s.start).with_end(%s.end)\n",
-                    targetClip, targetClip, targetClip, targetClip));
-             */
+            // We need to re-set the start/end timers after applying an effect
+
+            resetStartTime(targetClip);
         }
     }
 
@@ -191,6 +198,22 @@ public class ToWiring extends Visitor<StringBuffer> {
     public void visit(Blur blur) {
         // TODO NOT YET IMPLEMENTED
         return;
+    }
+
+    @Override
+    public void visit(Resize resize) {
+        String targetClip = resize.getClipName();
+
+        if(resize.isScale){
+            w(String.format("%s = %s.resize(%f)\n",
+                    targetClip, targetClip, resize.getScale()));
+        }
+        else {
+            w(String.format("%s = %s.resize((width=%d, height=%d))\n",
+                    targetClip, targetClip, resize.getWidth(), resize.getHeight()));
+        }
+
+        resetStartTime(targetClip);
     }
 
     private String getClipTime(String clipName, Video video, boolean isStartTime) {
@@ -215,7 +238,30 @@ public class ToWiring extends Visitor<StringBuffer> {
         return getClipTime(clipName, video, true);
     }
 
+    private String getClipStartTime(String clipName){
+        // We get the clip from the Video object
+        Optional<Clip> clip = video.getTimeline().stream()
+                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .map(e -> (Clip) e)
+                .findFirst();
+
+        if(clip.isPresent()){
+            return clip.get().getStartTime();
+        } else {
+            throw new RuntimeException("Clip not found: " + clipName);
+        }
+    }
+
     private String getClipEndTime(String clipName, Video video) {
         return getClipTime(clipName, video, false);
+    }
+
+    public void resetStartTime(String targetClip){
+        String startTime = getClipStartTime(targetClip);
+        if(startTime == null)
+            startTime = currentStart;
+
+        w(String.format("%s = %s.with_start(%s).with_end(%s.end)\n",
+                targetClip, targetClip, startTime.replace("s", ""), targetClip));
     }
 }

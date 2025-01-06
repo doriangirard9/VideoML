@@ -17,6 +17,7 @@ statement       : caption
                 | blur
                 | crop
                 | freeze
+                | resize
                 | concatenate
                 ;
 
@@ -48,6 +49,12 @@ blur            : 'blur' IDENTIFIER 'at' timestamp 'for' time ;
 crop            : 'crop' ('top' | 'bottom' | 'left' | 'right') NUMBER '%' ('of' STRING)+ 'as' IDENTIFIER ;
 
 freeze          : 'freeze' IDENTIFIER 'at' start=time 'for' effect_duration=time ;
+
+resize          : 'resize' IDENTIFIER 'to' (dimensions | percentage) ;
+
+dimensions      : width=NUMBER 'x' height=NUMBER ;
+
+percentage      : NUMBER '%';
 
 concatenate     : 'concatenate' STRING ('and' STRING)+ ('as' IDENTIFIER)? ;
 
