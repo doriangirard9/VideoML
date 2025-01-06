@@ -31,7 +31,7 @@ combine         : 'combine' STRING ('and' STRING)+ ;
 
 cut             : 'cut' STRING 'from' time 'to' time 'as' IDENTIFIER ;
 
-stack           : 'stack' STRING 'on' STRING 'at' '(' position ',' position ')' ('scale' FLOAT)? 'as' IDENTIFIER ;
+stack           : 'stack' STRING 'on' STRING ('at' '(' position ',' position ')')? ('scale' FLOAT)?;
 
 transition      : 'transition' STRING 'on' IDENTIFIER 'duration' time ;
 

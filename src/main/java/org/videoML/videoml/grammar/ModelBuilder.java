@@ -154,23 +154,25 @@ public class ModelBuilder extends VideoMLBaseListener {
 
     @Override
     public void enterStack(VideoMLParser.StackContext ctx) {
-        String overlayPath = ctx.STRING(0).getText().replace("\"", "");
-        String basePath = ctx.STRING(1).getText().replace("\"", "");
-        String position1 = ctx.position(0).getText();
-        String position2 = ctx.position(1).getText();
+        String foregroundVideo = ctx.STRING(0).getText().replace("\"", "");
+        String backgroundVideo = ctx.STRING(1).getText().replace("\"", "");
+        String position1 = ctx.position(0) != null ? ctx.position(0).getText() : "center";
+        String position2 = ctx.position(1) != null ? ctx.position(1).getText() : "center";
         double scale = ctx.FLOAT() != null ? Double.parseDouble(ctx.FLOAT().getText()) : 1.0;
-        String name = ctx.IDENTIFIER().getText();
 
         System.out.printf(
-                "Stacking clip: %s on %s at (%s, %s) with scale %f as %s%n",
-                overlayPath, basePath, position1, position2, scale, name
+                "Stacking clip: %s on %s at (%s, %s) with scale %f",
+                foregroundVideo, backgroundVideo, position1, position2, scale
         );
 
-        VideoClip overlayClip = new VideoClip(name, overlayPath);
-        overlayClip.setPosition(position1, position2);
-        overlayClip.setScale(scale);
-
-        video.addTimelineElement(overlayClip);
+        VideoClip backgroundClip = new VideoClip("background", backgroundVideo);
+        video.addTimelineElement(backgroundClip);
+        
+        VideoClip foregroundClip = new VideoClip("foreground", foregroundVideo);
+        foregroundClip.setPosition(position1, position2);
+        foregroundClip.setScale(scale);
+        foregroundClip.setStartTime(String.format("%s.start", backgroundClip.getName()));
+        video.addTimelineElement(foregroundClip);
     }
 
     @Override
