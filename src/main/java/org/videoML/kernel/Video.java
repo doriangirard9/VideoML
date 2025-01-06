@@ -57,7 +57,7 @@ public class Video implements Visitable {
     }
 
     public void addResize(String clipName, int width, int height, double scale) {
-        System.out.println("ADDING RESIZE EFFECT TO CLIP: " + clipName + " WITH SCALE: " + scale + " AND DIMENSIONS: " + width + "x" + height);
+        System.out.println("VIDEO.JAVA ADDING RESIZE EFFECT TO CLIP: " + clipName + " WITH SCALE: " + scale + " AND DIMENSIONS: " + width + "x" + height);
         Optional<Clip> clip = timeline.stream()
                 .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)

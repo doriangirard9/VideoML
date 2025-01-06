@@ -13,3 +13,5 @@ caption "s3" on clip1b 5s before clip1b for 15s
 caption "thanks" for 10s
 
 freeze clip1a at 3s for 5s
+
+resize clip1a to 30%

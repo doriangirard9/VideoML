@@ -202,14 +202,15 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Resize resize) {
+        System.out.println("VISITING RESIZE EFFECT");
         String targetClip = resize.getClipName();
 
         if(resize.isScale){
-            w(String.format("%s = %s.resize(%f)\n",
+            w(String.format("%s = %s.resized(%f)\n",
                     targetClip, targetClip, resize.getScale()));
         }
         else {
-            w(String.format("%s = %s.resize((width=%d, height=%d))\n",
+            w(String.format("%s = %s.resized(width=%d, height=%d)\n",
                     targetClip, targetClip, resize.getWidth(), resize.getHeight()));
         }
 
