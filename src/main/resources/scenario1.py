@@ -11,7 +11,7 @@ video_height = 720
 final_clips = []
 caption1 = (TextClip(text="Paris, 20/12/2024", font=font, font_size=48, color='white').with_duration(10).with_position('center').with_start(0))
 final_clips.append(caption1)
-first_clip = VideoFileClip("first_clip.mp4").with_start(caption1.end)
+first_clip = VideoFileClip("first_clip.mov").with_start(caption1.end)
 final_clips.append(first_clip)
 second_clip = VideoFileClip("second_clip.mp4").with_start(first_clip.end)
 final_clips.append(second_clip)

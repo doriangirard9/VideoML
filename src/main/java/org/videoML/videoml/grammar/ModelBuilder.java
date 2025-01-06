@@ -5,8 +5,12 @@ import org.videoML.kernel.Caption;
 
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.VideoClip;
+import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
+import org.videoML.videoml.grammar.exceptions.VideoTimeException;
+import org.videoML.videoml.grammar.helpers.VideoHelper;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
+
 
 public class ModelBuilder extends VideoMLBaseListener {
     private Video video = null;
@@ -41,14 +45,23 @@ public class ModelBuilder extends VideoMLBaseListener {
     @Override
     public void enterCut(VideoMLParser.CutContext ctx) {
         String sourcePath = ctx.STRING().getText().replace("\"", "");
+
+        if (!VideoHelper.checkExtension(sourcePath)) {
+            throw new VideoExtensionException(VideoExtensionException.buildMessage(sourcePath));
+        }
+
         String startTime = ctx.time(0).getText();
         String endTime = ctx.time(1).getText();
+
+        if (!VideoHelper.checkTime(sourcePath, startTime, endTime)) {
+            throw new VideoTimeException(VideoTimeException.buildMessage(sourcePath, startTime, endTime));
+        }
+
         String name = ctx.IDENTIFIER().getText();
 
         System.out.println("Cutting clip: " + sourcePath + " from " + startTime + " to " + endTime + " as " + name);
         CutClip cutClip = new CutClip(name, sourcePath, startTime, endTime);
         video.addTimelineElement(cutClip);
-
     }
 
     /*
@@ -125,6 +138,12 @@ public class ModelBuilder extends VideoMLBaseListener {
         System.out.println("Combining clips...");
         for (int i = 0; i < ctx.STRING().size(); i++) {
             String clipPath = ctx.STRING(i).getText().replace("\"", "");
+
+            if (!VideoHelper.checkExtension(clipPath)) {
+                throw new VideoExtensionException(VideoExtensionException.buildMessage(clipPath));
+            }
+
+
             String clipName = clipPath.split("/")[clipPath.split("/").length - 1];
             clipName = clipName.substring(0, clipName.lastIndexOf('.'));
             System.out.println("Adding clip: " + clipPath);
