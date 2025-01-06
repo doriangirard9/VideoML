@@ -10,11 +10,26 @@ fi
 FILE_NAME=$1
 
 # Compile ANTLR4 grammar
-mvn clean package
+if mvn clean package ; then
+  echo "Compilation successful."
+else
+  echo "Compilation failed."
+  exit 1
+fi
 
 # Execute the code with the given arguments
-mvn exec:java -Dexec.args="src/main/resources/$FILE_NAME.videoml"
+if mvn exec:java -Dexec.args="src/main/resources/$FILE_NAME.videoml" ; then
+  echo "Code generation successful."
+else
+  echo "Code generation failed."
+  exit 1
+fi
 
 # Execute the generated code
 cd src/main/resources
-python3 $FILE_NAME.py
+if python3 $FILE_NAME.py ; then
+  echo "Execution successful."
+else
+  echo "Execution failed."
+  exit 1
+fi

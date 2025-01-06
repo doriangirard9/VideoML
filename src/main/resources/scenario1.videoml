@@ -2,6 +2,6 @@ Project Holidays
 
 caption "Paris, 20/12/2024" for 10s
 
-combine "first_clip.mp4" and "second_clip.mp4"
+combine "first_clip.mov" and "second_clip.mp4"
 
 caption "Thanks for watching !" for 15s
