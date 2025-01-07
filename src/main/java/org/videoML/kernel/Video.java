@@ -57,7 +57,6 @@ public class Video implements Visitable {
     }
 
     public void addResize(String clipName, int width, int height, double scale) {
-        System.out.println("VIDEO.JAVA ADDING RESIZE EFFECT TO CLIP: " + clipName + " WITH SCALE: " + scale + " AND DIMENSIONS: " + width + "x" + height);
         Optional<Clip> clip = timeline.stream()
                 .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)
@@ -65,13 +64,16 @@ public class Video implements Visitable {
 
         if (clip.isPresent()) {
             Resize resize;
+            System.out.println("Trying to create Resize effect object");
             if(width == -1 && height == -1){
                 // Scaled resize, without dimensions
-                resize = new Resize(scale);
+                resize = new Resize(scale, clipName);
+                System.out.println("Managed to create scale resize effect object");
             }
             else {
                 // Fixed resize, with dimensions
-                resize = new Resize(width, height);
+                resize = new Resize(width, height, clipName);
+                System.out.println("Managed to create fixed resize effect object");
             }
             clip.get().addEffect(resize);
         } else {

@@ -81,9 +81,7 @@ public class ToWiring extends Visitor<StringBuffer> {
                 case "resize":
                     Resize resize = (Resize) effect;
                     this.visit(resize);
-                default:
-                    System.err.println("Unsupported effect: " + effect.getEffectName());
-                    System.exit(1);
+                    break;
             }
         }
 
@@ -112,6 +110,10 @@ public class ToWiring extends Visitor<StringBuffer> {
                 case "blur":
                     Blur blur = (Blur) effect;
                     this.visit(blur);
+                    break;
+                case "resize":
+                    Resize resize = (Resize) effect;
+                    this.visit(resize);
                     break;
             }
         }
@@ -202,12 +204,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Resize resize) {
-        System.out.println("VISITING RESIZE EFFECT");
         String targetClip = resize.getClipName();
 
         if(resize.isScale){
-            w(String.format("%s = %s.resized(%f)\n",
-                    targetClip, targetClip, resize.getScale()));
+            w(String.format("%s = %s.resized(%s)\n",
+                    targetClip, targetClip, String.valueOf(resize.getScale()/100).replace(",", ".")));
         }
         else {
             w(String.format("%s = %s.resized(width=%d, height=%d)\n",
@@ -239,26 +240,12 @@ public class ToWiring extends Visitor<StringBuffer> {
         return getClipTime(clipName, video, true);
     }
 
-    private String getClipStartTime(String clipName){
-        // We get the clip from the Video object
-        Optional<Clip> clip = video.getTimeline().stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
-                .map(e -> (Clip) e)
-                .findFirst();
-
-        if(clip.isPresent()){
-            return clip.get().getStartTime();
-        } else {
-            throw new RuntimeException("Clip not found: " + clipName);
-        }
-    }
-
     private String getClipEndTime(String clipName, Video video) {
         return getClipTime(clipName, video, false);
     }
 
     public void resetStartTime(String targetClip){
-        String startTime = getClipStartTime(targetClip);
+        String startTime = video.getStartTimeForClip(targetClip);
         if(startTime == null)
             startTime = currentStart;
 

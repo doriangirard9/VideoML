@@ -212,7 +212,6 @@ public class ModelBuilder extends VideoMLBaseListener {
 
     @Override
     public void enterResize(VideoMLParser.ResizeContext ctx) {
-        System.out.println("ENTERING RESIZE IN MODELBUILDER");
         String clipName = ctx.IDENTIFIER().getText();
         int scale;
         int width;

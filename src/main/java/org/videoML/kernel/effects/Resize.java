@@ -11,17 +11,19 @@ public class Resize extends Effect implements Visitable {
 
     public boolean isScale;
 
-    public Resize(int width, int height) {
+    public Resize(int width, int height, String clipName) {
         this.width = width;
         this.height = height;
         this.isScale = false;
         this.setEffectName("resize");
+        this.setClipName(clipName);
     }
 
-    public Resize(double scale) {
+    public Resize(double scale, String clipName) {
         this.scale = scale;
         this.isScale = true;
         this.setEffectName("resize");
+        this.setClipName(clipName);
     }
 
     @Override
