@@ -19,6 +19,8 @@ statement       : caption
                 | freeze
                 | resize
                 | rotate
+                | slow
+                | accelerate
                 | concatenate
                 ;
 
@@ -58,6 +60,10 @@ dimensions      : width=NUMBER 'x' height=NUMBER ;
 percentage      : NUMBER '%';
 
 rotate          : 'rotate' IDENTIFIER 'by' NUMBER 'degrees' ;
+
+slow            : 'slow' IDENTIFIER 'by' percentage ;
+
+accelerate      : 'accelerate' IDENTIFIER 'by' percentage ;
 
 concatenate     : 'concatenate' STRING ('and' STRING)+ ('as' IDENTIFIER)? ;
 

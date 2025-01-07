@@ -5,10 +5,7 @@ import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.VideoClip;
-import org.videoML.kernel.effects.Blur;
-import org.videoML.kernel.effects.Freeze;
-import org.videoML.kernel.effects.Resize;
-import org.videoML.kernel.effects.Rotate;
+import org.videoML.kernel.effects.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +27,7 @@ public abstract class Visitor<T> {
     public abstract void visit(Blur blur);
     public abstract void visit(Resize resize);
     public abstract void visit(Rotate rotate);
+    public abstract void visit(SpeedChanger speedChanger);
 
     /***********************
      ** Helper mechanisms **

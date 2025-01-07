@@ -248,4 +248,34 @@ public class ModelBuilder extends VideoMLBaseListener {
 
         video.addResize(clipName, width, height, scale);
     }
+
+    @Override
+    public void enterSlow(VideoMLParser.SlowContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        double factor = Double.parseDouble(ctx.percentage().NUMBER().getText().replace("%", ""));
+
+        System.out.println("Entering slow for clip: " + clipName + " with factor: " + factor);
+
+        System.out.printf(
+                "Slowing down clip: %s with value %f%n",
+                clipName, factor
+        );
+
+        video.addSpeedChanger(clipName, factor, false);
+    }
+
+    @Override
+    public void enterAccelerate(VideoMLParser.AccelerateContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        double factor = Double.parseDouble(ctx.percentage().NUMBER().getText());
+
+        System.out.println("Entering accelerate for clip: " + clipName + " with factor: " + factor);
+
+        System.out.printf(
+                "Speeding up clip: %s with value %f%n",
+                clipName, factor
+        );
+
+        video.addSpeedChanger(clipName, factor, true);
+    }
 }

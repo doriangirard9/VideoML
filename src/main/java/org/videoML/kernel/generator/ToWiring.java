@@ -84,6 +84,10 @@ public class ToWiring extends Visitor<StringBuffer> {
                     Rotate rotate = (Rotate) effect;
                     this.visit(rotate);
                     break;
+                case "speedChanger":
+                    SpeedChanger speedChanger = (SpeedChanger) effect;
+                    this.visit(speedChanger);
+                    break;
             }
         }
 
@@ -120,6 +124,10 @@ public class ToWiring extends Visitor<StringBuffer> {
                 case "rotate":
                     Rotate rotate = (Rotate) effect;
                     this.visit(rotate);
+                    break;
+                case "speedChanger":
+                    SpeedChanger speedChanger = (SpeedChanger) effect;
+                    this.visit(speedChanger);
                     break;
             }
         }
@@ -239,6 +247,18 @@ public class ToWiring extends Visitor<StringBuffer> {
         // In a rotate case, resetting the start time might not be necessary
         // resetStartTime(targetClip);
 
+    }
+
+    @Override
+    public void visit(SpeedChanger speedChanger) {
+        String targetClip = speedChanger.getClipName();
+
+        if(targetClip == null) return;
+
+        w(String.format("%s = %s.with_effects([vfx.MultiplySpeed(%s)])\n",
+                targetClip, targetClip, speedChanger.getFactor()));
+
+        resetStartTime(targetClip);
     }
 
     private String getClipTime(String clipName, Video video, boolean isStartTime) {

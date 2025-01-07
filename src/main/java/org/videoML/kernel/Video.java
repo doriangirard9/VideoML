@@ -4,6 +4,7 @@ import org.videoML.kernel.clips.*;
 import org.videoML.kernel.effects.Freeze;
 import org.videoML.kernel.effects.Resize;
 import org.videoML.kernel.effects.Rotate;
+import org.videoML.kernel.effects.SpeedChanger;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
@@ -91,6 +92,20 @@ public class Video implements Visitable {
         if (clip.isPresent()) {
             Rotate rotate = new Rotate(angle, clipName);
             clip.get().addEffect(rotate);
+        } else {
+            throw new RuntimeException("Clip not found: " + clipName);
+        }
+    }
+
+    public void addSpeedChanger(String clipName, double factor, boolean isSpeedup){
+        Optional<Clip> clip = timeline.stream()
+                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .map(e -> (Clip) e)
+                .findFirst();
+
+        if (clip.isPresent()) {
+            SpeedChanger speedChanger = new SpeedChanger(clipName, factor, isSpeedup);
+            clip.get().addEffect(speedChanger);
         } else {
             throw new RuntimeException("Clip not found: " + clipName);
         }
