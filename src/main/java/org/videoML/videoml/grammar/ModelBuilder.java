@@ -205,6 +205,19 @@ public class ModelBuilder extends VideoMLBaseListener {
     }
 
     @Override
+    public void enterRotate(VideoMLParser.RotateContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        int angle = Integer.parseInt(ctx.NUMBER().getText());
+
+        System.out.printf(
+                "Rotating clip: %s with angle %d%n",
+                clipName, angle
+        );
+
+        video.addRotate(clipName, angle);
+    }
+
+    @Override
     public void enterBlur(VideoMLParser.BlurContext ctx) {
         // TODO! NOT YET IMPLEMENTED
         return;

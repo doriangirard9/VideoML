@@ -18,6 +18,7 @@ statement       : caption
                 | crop
                 | freeze
                 | resize
+                | rotate
                 | concatenate
                 ;
 
@@ -55,6 +56,8 @@ resize          : 'resize' IDENTIFIER 'to' (dimensions | percentage) ;
 dimensions      : width=NUMBER 'x' height=NUMBER ;
 
 percentage      : NUMBER '%';
+
+rotate          : 'rotate' IDENTIFIER 'by' NUMBER 'degrees' ;
 
 concatenate     : 'concatenate' STRING ('and' STRING)+ ('as' IDENTIFIER)? ;
 

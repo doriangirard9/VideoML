@@ -3,6 +3,7 @@ package org.videoML.kernel;
 import org.videoML.kernel.clips.*;
 import org.videoML.kernel.effects.Freeze;
 import org.videoML.kernel.effects.Resize;
+import org.videoML.kernel.effects.Rotate;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
@@ -76,6 +77,20 @@ public class Video implements Visitable {
                 System.out.println("Managed to create fixed resize effect object");
             }
             clip.get().addEffect(resize);
+        } else {
+            throw new RuntimeException("Clip not found: " + clipName);
+        }
+    }
+
+    public void addRotate(String clipName, int angle) {
+        Optional<Clip> clip = timeline.stream()
+                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .map(e -> (Clip) e)
+                .findFirst();
+
+        if (clip.isPresent()) {
+            Rotate rotate = new Rotate(angle, clipName);
+            clip.get().addEffect(rotate);
         } else {
             throw new RuntimeException("Clip not found: " + clipName);
         }

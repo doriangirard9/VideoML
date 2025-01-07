@@ -1,5 +1,6 @@
 package org.videoML.kernel.generator;
 
+import org.apache.commons.io.input.ReaderInputStream;
 import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
@@ -7,10 +8,7 @@ import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.VideoClip;
 import org.videoML.kernel.Caption;
-import org.videoML.kernel.effects.Blur;
-import org.videoML.kernel.effects.Effect;
-import org.videoML.kernel.effects.Freeze;
-import org.videoML.kernel.effects.Resize;
+import org.videoML.kernel.effects.*;
 
 import java.util.Optional;
 
@@ -82,6 +80,10 @@ public class ToWiring extends Visitor<StringBuffer> {
                     Resize resize = (Resize) effect;
                     this.visit(resize);
                     break;
+                case "rotate":
+                    Rotate rotate = (Rotate) effect;
+                    this.visit(rotate);
+                    break;
             }
         }
 
@@ -114,6 +116,10 @@ public class ToWiring extends Visitor<StringBuffer> {
                 case "resize":
                     Resize resize = (Resize) effect;
                     this.visit(resize);
+                    break;
+                case "rotate":
+                    Rotate rotate = (Rotate) effect;
+                    this.visit(rotate);
                     break;
             }
         }
@@ -206,6 +212,8 @@ public class ToWiring extends Visitor<StringBuffer> {
     public void visit(Resize resize) {
         String targetClip = resize.getClipName();
 
+        if(targetClip == null) return;
+
         if(resize.isScale){
             w(String.format("%s = %s.resized(%s)\n",
                     targetClip, targetClip, String.valueOf(resize.getScale()/100).replace(",", ".")));
@@ -215,7 +223,22 @@ public class ToWiring extends Visitor<StringBuffer> {
                     targetClip, targetClip, resize.getWidth(), resize.getHeight()));
         }
 
-        resetStartTime(targetClip);
+        // In a resize case, resetting the start time might not be necessary
+        // resetStartTime(targetClip);
+    }
+
+    @Override
+    public void visit(Rotate rotate) {
+        String targetClip = rotate.getClipName();
+
+        if(targetClip == null) return;
+
+        w(String.format("%s = %s.with_effects([vfx.Rotate(%d)])\n",
+                targetClip, targetClip, rotate.getAngle()));
+
+        // In a rotate case, resetting the start time might not be necessary
+        // resetStartTime(targetClip);
+
     }
 
     private String getClipTime(String clipName, Video video, boolean isStartTime) {
