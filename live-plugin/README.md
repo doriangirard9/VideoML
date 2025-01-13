@@ -19,4 +19,3 @@ This is a plugin that allows you to add / run a plugin without having to develop
 ## Plugin developed
 
 - [ ] Generate video on right click or shortcut on a .videoml file
-- [ ] Generate a preview of the video on right click or shortcut on a .videoml file
