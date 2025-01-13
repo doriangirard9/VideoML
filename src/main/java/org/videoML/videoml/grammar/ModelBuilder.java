@@ -5,8 +5,14 @@ import org.videoML.kernel.clips.video.CompositeVideoClip;
 import org.videoML.kernel.clips.video.CutVideoClip;
 import org.videoML.kernel.clips.video.TextClip;
 import org.videoML.kernel.clips.video.VideoClip;
-import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
-import org.videoML.videoml.grammar.helpers.VideoHelper;
+import org.videoML.kernel.effects.video.Crop;
+import org.videoML.kernel.effects.video.Freeze;
+import org.videoML.kernel.effects.video.Resize;
+import org.videoML.kernel.effects.video.Rotate;
+import org.videoML.kernel.effects.video.SpeedChanger;
+import org.videoML.kernel.effects.video.Transition;
+import org.videoML.kernel.effects.video.TransitionType;
+
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
 
@@ -43,6 +49,18 @@ public class ModelBuilder extends VideoMLBaseListener {
     public void enterProjectName(VideoMLParser.ProjectNameContext ctx) {
         System.out.println("Project name is: " + ctx.IDENTIFIER().getText());
         video.setName(ctx.IDENTIFIER().getText());
+        
+        if (ctx.NUMBER() != null) {
+            int fps = Integer.parseInt(ctx.NUMBER().getText());
+            video.setFps(fps);
+        }
+
+        if (ctx.dimensions() != null) {
+            int width = Integer.parseInt(ctx.dimensions().width.getText());
+            int height = Integer.parseInt(ctx.dimensions().height.getText());
+            video.setWidth(width);
+            video.setHeight(height);
+        }
     }
 
     @Override
@@ -58,6 +76,7 @@ public class ModelBuilder extends VideoMLBaseListener {
 
             VideoClip clip = new VideoClip(clipName, getVideoClipNameFromPath(clipPath));
             video.addTimelineElement(clip);
+            System.out.println(clip.getParent());
             System.out.println("Adding clip: " + clipPath + " with name " + clip.getName());
         }
     }
@@ -207,69 +226,133 @@ public class ModelBuilder extends VideoMLBaseListener {
         );
         
         foregroundClip.setPosition(position1, position2);
-        foregroundClip.setScale(scale);
+        Resize foregroundClipResize = new Resize(scale, foregroundClip.getName());
+        foregroundClip.addEffect(foregroundClipResize);
         foregroundClip.setStartTime(String.format("%s.start", backgroundClip.getName()));
     }
 
     @Override
-    public void enterTransition(VideoMLParser.TransitionContext ctx) {
-        String effectName = ctx.STRING().getText().replace("\"", "");
+    public void enterResize(VideoMLParser.ResizeContext ctx) {
+        Resize resizeEffect = null;
+
         String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+
+        if (ctx.percentage() != null) {
+            double scale = Double.parseDouble(ctx.percentage().NUMBER().getText().replace("%", ""));
+            resizeEffect = new Resize(scale / 100, clipName);
+        }
+        else {
+            int width = Integer.parseInt(ctx.dimensions().width.getText());
+            int height = Integer.parseInt(ctx.dimensions().height.getText());
+            resizeEffect = new Resize(width, height, clipName);
+        }
+
+        videoClip.addEffect(resizeEffect);
+    }
+
+    @Override
+    public void enterTransition(VideoMLParser.TransitionContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+        Transition transition = null;
         int duration = Integer.parseInt(ctx.time().getText().replace("s", ""));
 
+        if (ctx.fadeIn != null)
+            transition = new Transition(TransitionType.FADEIN, duration, clipName);
+        else
+            transition = new Transition(TransitionType.FADEOUT, duration, clipName);
+
+        videoClip.addEffect(transition);
+    }
+
+    @Override
+    public void enterRotate(VideoMLParser.RotateContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+
+        int angle = Integer.parseInt(ctx.NUMBER().getText());
+        Rotate rotateEffect = new Rotate(angle, clipName);
+
         System.out.printf(
-                "Applying transition: %s on clip %s with duration %d seconds%n",
-                effectName, clipName, duration
+                "Rotating clip: %s with angle %d%n",
+                clipName, angle
         );
 
-        video.addTransition(clipName, effectName, duration);
+        videoClip.addEffect(rotateEffect);
+    }
+
+    @Override
+    public void enterAccelerate(VideoMLParser.AccelerateContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+        double factor = Double.parseDouble(ctx.percentage().NUMBER().getText());
+        SpeedChanger speedChanger = new SpeedChanger(clipName, factor, true);
+
+        System.out.printf("Speeding up clip: %s with value %f%n", clipName, factor);
+        videoClip.addEffect(speedChanger);
+    }
+
+    @Override
+    public void enterSlow(VideoMLParser.SlowContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+        double factor = Double.parseDouble(ctx.percentage().NUMBER().getText());
+        SpeedChanger speedChanger = new SpeedChanger(clipName, factor, false);
+
+        System.out.printf("Slowing down clip: %s with value %f%n", clipName, factor);
+        videoClip.addEffect(speedChanger);
     }
 
     @Override
     public void enterFreeze(VideoMLParser.FreezeContext ctx) {
         String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
 
         String timer = ctx.start.getText().replace("s", "");
         String duration = ctx.effect_duration.getText().replace("s", "");
+
+        Freeze freeze = new Freeze(Integer.parseInt(timer), Integer.parseInt(duration), clipName);
 
         System.out.printf(
                 "Freezing clip: %s at timer %s for %s seconds%n",
                 clipName, timer, duration
         );
 
-        video.addFreeze(Integer.parseInt(timer), Integer.parseInt(duration), clipName);
+        videoClip.addEffect(freeze);
     }
 
     @Override
-    public void enterBlur(VideoMLParser.BlurContext ctx) {
-        // TODO! NOT YET IMPLEMENTED
-        return;
-    }
-
-    @Override
-    public void enterResize(VideoMLParser.ResizeContext ctx) {
-        System.out.println("ENTERING RESIZE IN MODELBUILDER");
+    public void enterCrop(VideoMLParser.CropContext ctx) {
         String clipName = ctx.IDENTIFIER().getText();
-        int scale;
-        int width;
-        int height;
+        VideoClip videoClip = video.getVideoClip(clipName);
+        int x1, y1, x2, y2;
 
-        if (ctx.percentage() != null) {
-            scale = Integer.parseInt(ctx.percentage().getText().replace("%", ""));
-            width = -1;
-            height = -1;
+        if (ctx.cropOptions().all != null) {
+            x1 = Integer.parseInt(ctx.cropOptions().all.getText().replace("%", ""));
+            y1 = x1;
+            x2 = x1;
+            y2 = x1;
+        }
+        else if (ctx.cropOptions().topBottom != null) {
+            x1 = Integer.parseInt(ctx.cropOptions().leftRight.getText().replace("%", ""));
+            y1 = Integer.parseInt(ctx.cropOptions().topBottom.getText().replace("%", ""));
+            x2 = x1;
+            y2 = y1;
         }
         else {
-            width = Integer.parseInt(ctx.dimensions().width.getText());
-            height = Integer.parseInt(ctx.dimensions().height.getText());
-            scale = -1;
+            x1 = Integer.parseInt(ctx.cropOptions().left.getText().replace("%", ""));
+            y1 = Integer.parseInt(ctx.cropOptions().top.getText().replace("%", ""));
+            x2 = Integer.parseInt(ctx.cropOptions().right.getText().replace("%", ""));
+            y2 = Integer.parseInt(ctx.cropOptions().bottom.getText().replace("%", ""));
         }
 
         System.out.printf(
-                "Resizing clip: %s with scale %d%n",
-                clipName, scale
+                "Cropping clip: %s from (%d, %d) to (%d, %d)\n",
+                clipName, x1, y1, x2, y2
         );
 
-        video.addResize(clipName, width, height, scale);
+        Crop cropEffect = new Crop(clipName, x1, y1, x2, y2);
+        videoClip.addEffect(cropEffect);
     }
 }

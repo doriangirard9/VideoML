@@ -15,3 +15,7 @@ caption "thanks" for 10s
 freeze clip1a at 3s for 5s
 
 resize clip1a to 30%
+
+rotate clip1a by 61 degrees
+
+accelerate clip1a by 60%

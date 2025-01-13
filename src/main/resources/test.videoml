@@ -1,10 +1,16 @@
-Project test
+Project stacking at 12fps
 
-cut "first_clip.mp4" from 0s to 5s as clip1
-cut "first_clip.mp4" from 5s to 10s as clip2
+cut "second_clip.mp4" from 0s to 1s as clip1
+add "second_clip.mp4" as clip2
+add "second_clip.mp4" as clip3
+add "second_clip.mp4" as clip4
 
-stack clip2 on clip1 at (left, bottom) scale 0.2
+stack clip4 on clip3 at (left, bottom) scale 0.5
+combine clip3 and clip4 as sub_clip
 
-# combine clip2 and clip1 as video
+stack sub_clip on clip2 at (left, bottom) scale 0.5
+combine clip2 and sub_clip as sub_clip2
 
-# caption "Titre video" on video wait 2s as text
+stack sub_clip2 on clip1 at (left, bottom) scale 0.5
+
+freeze clip1 at 1s for 4s

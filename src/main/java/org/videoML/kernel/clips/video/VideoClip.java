@@ -4,7 +4,6 @@ import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.generator.Visitor;
 
 public class VideoClip extends Clip {
-    private double scale = 1.0;
     private String positionX = "center";
     private String positionY = "center";
 
@@ -16,9 +15,6 @@ public class VideoClip extends Clip {
         this.setName(name);
         this.setSource(source);
     }
-
-    public double getScale() { return scale; }
-    public void setScale(double scale) { this.scale = scale; }
 
     public String getPositionX() { return positionX; }
     public String getPositionY() { return positionY; }

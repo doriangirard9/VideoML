@@ -26,7 +26,7 @@ You can define your project name using the `Project` keyword.
 Project example_video
 
 # Full example
-Project example_video at 24fps resolution (1280, 720)
+Project example_video at 24fps resolution 1280 x 720
 ```
 
 ## Captions

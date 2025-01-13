@@ -1,4 +1,4 @@
-package org.videoML.kernel.clips;
+package org.videoML.kernel.effects.video;
 
 public enum TransitionType {
     FADEIN, FADEOUT
