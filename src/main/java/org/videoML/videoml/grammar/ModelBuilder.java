@@ -1,12 +1,11 @@
 package org.videoML.videoml.grammar;
 
 import org.videoML.kernel.Video;
-import org.videoML.kernel.Caption;
-
-import org.videoML.kernel.clips.CutClip;
-import org.videoML.kernel.clips.VideoClip;
+import org.videoML.kernel.clips.video.CompositeVideoClip;
+import org.videoML.kernel.clips.video.CutVideoClip;
+import org.videoML.kernel.clips.video.TextClip;
+import org.videoML.kernel.clips.video.VideoClip;
 import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
-import org.videoML.videoml.grammar.exceptions.VideoTimeException;
 import org.videoML.videoml.grammar.helpers.VideoHelper;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
@@ -15,6 +14,10 @@ import videoml.grammar.VideoMLParser;
 public class ModelBuilder extends VideoMLBaseListener {
     private Video video = null;
     private boolean built = false;
+
+    private String getVideoClipNameFromPath(String path) {
+        return String.format("VideoFileClip(\"%s\")", path);
+    }
 
     public Video retrieve() {
         if (built) {
@@ -43,136 +46,169 @@ public class ModelBuilder extends VideoMLBaseListener {
     }
 
     @Override
-    public void enterCut(VideoMLParser.CutContext ctx) {
-        String sourcePath = ctx.STRING().getText().replace("\"", "");
+    public void enterAdd(VideoMLParser.AddContext ctx) {
+        for (int i = 0; i < ctx.video().size(); i++) {
+            String clipPath = ctx.video(i).STRING().getText().replace("\"", "");
 
-        if (!VideoHelper.checkExtension(sourcePath)) {
-            throw new VideoExtensionException(VideoExtensionException.buildMessage(sourcePath));
+            String clipName;
+            if (ctx.video(i).IDENTIFIER() != null)
+                clipName = ctx.video(i).IDENTIFIER().getText();
+            else
+                clipName = video.generateClipName();
+
+            VideoClip clip = new VideoClip(clipName, getVideoClipNameFromPath(clipPath));
+            video.addTimelineElement(clip);
+            System.out.println("Adding clip: " + clipPath + " with name " + clip.getName());
         }
+    }
+
+    @Override
+    public void enterCut(VideoMLParser.CutContext ctx) {
+        String clipName;
+        if (ctx.name != null)
+            clipName = ctx.name.getText();
+        else
+            clipName = video.generateClipName();
+
+        String targetName;
+        // Path to a clip
+        if (ctx.variable().STRING() != null) {
+            String targetClipPath = ctx.variable().STRING().getText().replace("\"", "");
+            targetName = getVideoClipNameFromPath(targetClipPath);
+        }
+        // VideoClip variable
+        else {
+            targetName = ctx.variable().IDENTIFIER().getText();
+        }
+
+        CutVideoClip cutVideoClip = new CutVideoClip(clipName, targetName);
 
         String startTime = ctx.time(0).getText();
         String endTime = ctx.time(1).getText();
+        cutVideoClip.setStart(startTime);
+        cutVideoClip.setEnd(endTime);
 
-        if (!VideoHelper.checkTime(sourcePath, startTime, endTime)) {
-            throw new VideoTimeException(VideoTimeException.buildMessage(sourcePath, startTime, endTime));
-        }
-
-        String name = ctx.IDENTIFIER().getText();
-
-        System.out.println("Cutting clip: " + sourcePath + " from " + startTime + " to " + endTime + " as " + name);
-        CutClip cutClip = new CutClip(name, sourcePath, startTime, endTime);
-        video.addTimelineElement(cutClip);
+        System.out.println("Cutting clip: " + cutVideoClip.getSource() + " from " + startTime + " to " + endTime + " as " + cutVideoClip.getName());
+        video.addTimelineElement(cutVideoClip);
     }
 
-    /*
-    caption         : 'caption' STRING ('on' IDENTIFIER)? (duration | offset | offsetWithDuration)? ;
-    duration        : 'for' time ;
-    offset          : 'from' from=time 'to' to=time
-                    | NUMBER 's' ('after' after=IDENTIFIER | 'before' before=IDENTIFIER)? ;
-    offsetWithDuration
-    : offset duration ;
-    time             : NUMBER 's' ;
-
-     */
     @Override
     public void enterCaption(VideoMLParser.CaptionContext ctx) {
         String text = ctx.STRING().getText().replace("\"", "");
-        int duration = 0;
+
         String clipName = null;
-        int offsetValue = 0;
-        String relativeClipOrCaption = null;
-        String beforeOrAfter = null;
-
-        // ('on' IDENTIFIER)?
-        if (ctx.IDENTIFIER() != null) {
+        if (ctx.IDENTIFIER() != null)
             clipName = ctx.IDENTIFIER().getText();
-        }
+        else
+            clipName = video.generateClipName();
+        TextClip caption = new TextClip(clipName);
 
-        // offset duration => offsetWithDuration
-        if (ctx.offsetWithDuration() != null) {
-            offsetValue = Integer.parseInt(ctx.offsetWithDuration().offset().NUMBER().getText()) * (ctx.offsetWithDuration().offset().after != null ? 1 : -1);
-            duration = Integer.parseInt(ctx.offsetWithDuration().duration().time().getText().replace("s", ""));
-            relativeClipOrCaption = ctx.offsetWithDuration().offset().after != null ?
-                    ctx.offsetWithDuration().offset().after.getText() :
-                    ctx.offsetWithDuration().offset().before.getText();
-            beforeOrAfter = ctx.offsetWithDuration().offset().after != null ? "after" : "before";
-        } else {
-            // 'for' time
-            if (ctx.duration() != null) {
-                duration = Integer.parseInt(ctx.duration().time().getText().replace("s", ""));
+        caption.setText(text);
+
+        // tied to a clip
+        if (ctx.offset() != null) {
+            String targetClipName = null;
+
+            // VideoClip variable
+            if (ctx.offset().variable().IDENTIFIER() != null)
+                targetClipName = ctx.offset().variable().IDENTIFIER().getText();
+            // VideoClip path
+            else {
+                String targetClipPath = ctx.offset().variable().STRING().getText().replace("\"", "");
+                VideoClip targetClip = new VideoClip(video.generateClipName(), getVideoClipNameFromPath(targetClipPath));
+                video.addTimelineElement(targetClip);
+                targetClipName = targetClip.getName();
+            }
+            caption.setTargetClip(targetClipName);
+
+            // delay
+            if (ctx.offset().time() != null) {
+                int delay = Integer.parseInt(ctx.offset().time().getText().replace("s", ""));
+                caption.setDelay(delay);
             }
 
-            // 'from' from=time 'to' to=time
-            // | NUMBER 's' ('after' after=IDENTIFIER | 'before' before=IDENTIFIER)? ;
-            if (ctx.offset() != null) {
-                if (ctx.offset().from != null) {
-                    int from = Integer.parseInt(ctx.offset().from.getText().replace("s", ""));
-                    int to = Integer.parseInt(ctx.offset().to.getText().replace("s", ""));
-                    offsetValue = to - from;
-                    duration = to - from;
-                } else {
-                    if (ctx.offset().after != null) {
-                        relativeClipOrCaption = ctx.offset().after.getText();
-                        beforeOrAfter = "after";
-                    } else if (ctx.offset().before != null) {
-                        relativeClipOrCaption = ctx.offset().before.getText();
-                        beforeOrAfter = "before";
-                    }
-                    offsetValue = Integer.parseInt(ctx.offset().NUMBER().getText().replace("s", "")) * (ctx.offset().after != null ? 1 : -1);
-                }
+            // duration
+            if (ctx.offset().duration() != null) {
+                int duration = Integer.parseInt(ctx.offset().duration().time().getText().replace("s", ""));
+                caption.setDuration(duration);
             }
         }
-
+        else {
+            int duration = Integer.parseInt(ctx.duration().time().getText().replace("s", ""));
+            caption.setDuration(duration);
+        }
 
         System.out.printf(
-                "Adding caption: %s on clip %s at %d seconds %s %s for %d seconds%n",
-                text, clipName, offsetValue, beforeOrAfter, relativeClipOrCaption, duration
+                "Adding caption %s: %s on clip %s with %d seconds delay and for %d seconds\n",
+                clipName, text, caption.getTargetClip(), caption.getDelay(), caption.getDuration()
         );
-
-        Caption caption = new Caption(text, clipName, offsetValue, relativeClipOrCaption, duration);
         video.addTimelineElement(caption);
     }
 
     @Override
     public void enterCombine(VideoMLParser.CombineContext ctx) {
-        System.out.println("Combining clips...");
-        for (int i = 0; i < ctx.STRING().size(); i++) {
-            String clipPath = ctx.STRING(i).getText().replace("\"", "");
+        String compositeClipName = ctx.IDENTIFIER().getText();
+        CompositeVideoClip compositeClip = new CompositeVideoClip(compositeClipName);
 
-            if (!VideoHelper.checkExtension(clipPath)) {
-                throw new VideoExtensionException(VideoExtensionException.buildMessage(clipPath));
+        for (int i = 0; i < ctx.variable().size(); i++) {
+            VideoClip videoClip = null;
+            // Path to a clip, so we need to generate the clip
+            if (ctx.variable(i).STRING() != null) {
+                String clipPath = ctx.variable(i).STRING().getText().replace("\"", "");
+                videoClip = new VideoClip(video.generateClipName(), getVideoClipNameFromPath(clipPath));
+                video.addTimelineElement(videoClip);
+            }
+            else {
+                String clipName = ctx.variable(i).IDENTIFIER().getText();
+                videoClip = video.getVideoClip(clipName);
             }
 
-
-            String clipName = clipPath.split("/")[clipPath.split("/").length - 1];
-            clipName = clipName.substring(0, clipName.lastIndexOf('.'));
-            System.out.println("Adding clip: " + clipPath);
-            VideoClip clip = new VideoClip(clipName, clipPath);
-            video.addTimelineElement(clip);
+            compositeClip.addClip(videoClip);
+            videoClip.setParent(compositeClipName);
         }
+
+        video.addCombineClip(compositeClipName);
+        video.addTimelineElement(compositeClip);
     }
 
     @Override
     public void enterStack(VideoMLParser.StackContext ctx) {
-        String foregroundVideo = ctx.STRING(0).getText().replace("\"", "");
-        String backgroundVideo = ctx.STRING(1).getText().replace("\"", "");
+        // background clip
+        VideoClip backgroundClip = null;
+        if (ctx.variable(1).STRING() != null) {
+            String clipPath = ctx.variable(1).STRING().getText().replace("\"", "");
+            backgroundClip = new VideoClip(video.generateClipName(), getVideoClipNameFromPath(clipPath));
+            video.addTimelineElement(backgroundClip);
+        }
+        else {
+            String clipName = ctx.variable(1).IDENTIFIER().getText();
+            backgroundClip = video.getVideoClip(clipName);
+        }
+
+        // foreground clip
+        VideoClip foregroundClip = null;
+        if (ctx.variable(0).STRING() != null) {
+            String clipPath = ctx.variable(0).STRING().getText().replace("\"", "");
+            foregroundClip = new VideoClip(video.generateClipName(), getVideoClipNameFromPath(clipPath));
+            video.addTimelineElement(foregroundClip);
+        }
+        else {
+            String clipName = ctx.variable(0).IDENTIFIER().getText();
+            foregroundClip = video.getVideoClip(clipName);
+        }
+
         String position1 = ctx.position(0) != null ? ctx.position(0).getText() : "center";
         String position2 = ctx.position(1) != null ? ctx.position(1).getText() : "center";
         double scale = ctx.FLOAT() != null ? Double.parseDouble(ctx.FLOAT().getText()) : 1.0;
 
         System.out.printf(
                 "Stacking clip: %s on %s at (%s, %s) with scale %f",
-                foregroundVideo, backgroundVideo, position1, position2, scale
+                foregroundClip.getName(), backgroundClip.getName(), position1, position2, scale
         );
-
-        VideoClip backgroundClip = new VideoClip("background", backgroundVideo);
-        video.addTimelineElement(backgroundClip);
         
-        VideoClip foregroundClip = new VideoClip("foreground", foregroundVideo);
         foregroundClip.setPosition(position1, position2);
         foregroundClip.setScale(scale);
         foregroundClip.setStartTime(String.format("%s.start", backgroundClip.getName()));
-        video.addTimelineElement(foregroundClip);
     }
 
     @Override

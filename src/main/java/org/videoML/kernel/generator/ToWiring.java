@@ -5,7 +5,10 @@ import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
-import org.videoML.kernel.clips.VideoClip;
+import org.videoML.kernel.clips.video.CompositeVideoClip;
+import org.videoML.kernel.clips.video.CutVideoClip;
+import org.videoML.kernel.clips.video.TextClip;
+import org.videoML.kernel.clips.video.VideoClip;
 import org.videoML.kernel.Caption;
 import org.videoML.kernel.effects.Blur;
 import org.videoML.kernel.effects.Effect;
@@ -16,7 +19,6 @@ import java.util.Optional;
 
 
 public class ToWiring extends Visitor<StringBuffer> {
-    private int captionIndex = 1;
     private String currentStart = "0";
     private Video video;
 
@@ -31,7 +33,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override
     public void visit(Video video) {
         this.video = video;
-        w("# Code generated from a VideoML script\n");
+        w("# Code generated from a VideoML scrip\n");
         w(String.format("# Video name: %s\n", video.getName()) + "\n");
 
         w("from moviepy import *\n\n");
@@ -41,27 +43,23 @@ public class ToWiring extends Visitor<StringBuffer> {
         w("video_width = 1280\n");
         w("video_height = 720\n\n");
 
-        w("final_clips = []\n");
-
-        for (TimelineElement element : video.getTimeline()) {
-            if (element instanceof Caption) {
-                this.visit((Caption) element);
-            } else if (element instanceof VideoClip) {
-                this.visit((VideoClip) element);
-            } else if (element instanceof CutClip) {
-                this.visit((CutClip) element);
-            }
+        for (String listName : video.getCombineClipList()) {
+            w(String.format("%s_list = []\n", listName));
         }
 
-        w("final_clip = CompositeVideoClip(final_clips, size=(video_width, video_height))\n");
-        w("final_clip.write_videofile(\"output.mp4\", codec=\"libx264\")\n");
+        for (Clip clip : video.getTimeline()) {
+            clip.accept(this);
+        }
+
+        w(String.format("%s = CompositeVideoClip(%s_list, size=(video_width, video_height))\n", Video.getFinalClipName(), Video.getFinalClipName()));
+        w(String.format("%s.write_videofile(\"output.mp4\", codec=\"libx264\")\n", Video.getFinalClipName()));
     }
 
     @Override
     public void visit(VideoClip videoClip) {
         String startTime = (videoClip.getStartTime() != null) ? videoClip.getStartTime() : currentStart;
-        w(String.format("%s = VideoFileClip(\"%s\").with_start(%s)\n",
-            videoClip.getName(), videoClip.getPath(), startTime));
+        w(String.format("%s = %s.with_start(%s)\n",
+            videoClip.getName(), videoClip.getSource(), startTime));
 
         for (Transition transition : videoClip.getTransitions()) {
             this.visit(transition);
@@ -87,76 +85,88 @@ public class ToWiring extends Visitor<StringBuffer> {
             }
         }
 
-        w(String.format("final_clips.append(%s)\n", videoClip.getName()));
-        currentStart = String.format("%s.end", videoClip.getName());
+        w(String.format("%s_list.append(%s)\n", videoClip.getName(), videoClip.getParent()));
+        currentStart = String.format("%s.end", videoClip.getName(), videoClip.getParent());
+    }
+
+    @Override
+    public void visit(CutVideoClip cutVideoClip) {
+        String startTime = (cutVideoClip.getStartTime() != null) ? cutVideoClip.getStartTime() : currentStart;
+        w(String.format("%s = %s.subclipped(%s, %s).with_start(%s)\n",
+                cutVideoClip.getName(), cutVideoClip.getSource(),
+                cutVideoClip.getStart().replace("s", ""),
+                cutVideoClip.getEnd().replace("s", ""),
+                startTime));
+        
+        w(String.format("%s_list.append(%s)\n", cutVideoClip.getParent(), cutVideoClip.getName()));
+        currentStart = String.format("%s.end", cutVideoClip.getName());
+    }
+
+    @Override
+    public void visit(TextClip textClip) {
+        String duration = String.format("%d", textClip.getDuration());
+        String startTime = currentStart;
+
+        if (textClip.getTargetClip() != null) {
+            startTime = String.format("%s.start + %d", textClip.getTargetClip(), textClip.getDelay()); ;
+
+            // if duration is unset the text will sync with the target clip
+            if (textClip.getDuration() == 0)
+                duration = String.format("%s.start + %s.end - %d", textClip.getTargetClip(), textClip.getTargetClip(), textClip.getDelay());
+        }
+
+        w(String.format("%s = TextClip(text=\"%s\", font=font, font_size=48, color='white')"
+                + ".with_position('center')"
+                + ".with_start(%s)"
+                + ".with_duration(%s)\n",
+                textClip.getName(), textClip.getText(), startTime, duration));
+
+        // Only update currentStart when textClip is standalone        
+        if (textClip.getTargetClip() == null) {
+            currentStart = String.format("%s.end", textClip.getName());
+        }
+
+        w(String.format("%s_list.append(%s)\n", textClip.getParent(), textClip.getName()));
+    }
+
+    @Override
+    public void visit(CompositeVideoClip compositeVideoClip) {
+        w(String.format("%s = CompositeVideoClip(%s_list, size=(video_width, video_height))\n", 
+            compositeVideoClip.getName(),
+            compositeVideoClip.getName()));
+
+        w(String.format("%s_list.append(%s)\n", compositeVideoClip.getParent(), compositeVideoClip.getName()));
+        currentStart = String.format("%s.end", compositeVideoClip.getName());
     }
 
     @Override
     public void visit(CutClip clipCut) {
-        w(String.format("%s = VideoFileClip(\"%s\").subclipped(%s, %s).with_start(%s)\n",
-                clipCut.getName(), clipCut.getSourcePath(),
-                clipCut.getStartTime().replace("s", ""),
-                clipCut.getEndTime().replace("s", ""),
-                currentStart));
+        // w(String.format("%s = VideoFileClip(\"%s\").subclipped(%s, %s).with_start(%s)\n",
+        //         clipCut.getName(), clipCut.getSourcePath(),
+        //         clipCut.getStartTime().replace("s", ""),
+        //         clipCut.getEndTime().replace("s", ""),
+        //         currentStart));
 
-        for (Transition transition : clipCut.getTransitions()) {
-            this.visit(transition);
-        }
+        // for (Transition transition : clipCut.getTransitions()) {
+        //     this.visit(transition);
+        // }
 
-        for(Effect effect: clipCut.getEffects()){
-            switch(effect.getEffectName()){
-                case "freeze":
-                    Freeze freeze = (Freeze) effect;
-                    this.visit(freeze);
-                    break;
-                case "blur":
-                    Blur blur = (Blur) effect;
-                    this.visit(blur);
-                    break;
-            }
-        }
+        // for(Effect effect: clipCut.getEffects()){
+        //     switch(effect.getEffectName()){
+        //         case "freeze":
+        //             Freeze freeze = (Freeze) effect;
+        //             this.visit(freeze);
+        //             break;
+        //         case "blur":
+        //             Blur blur = (Blur) effect;
+        //             this.visit(blur);
+        //             break;
+        //     }
+        // }
 
 
-        w(String.format("final_clips.append(%s)\n", clipCut.getName()));
-        currentStart = String.format("%s.end", clipCut.getName());
-    }
-
-    @Override
-    public void visit(Caption caption) {
-        String startExpression;
-
-        if (caption.getClipName() == null) {
-            // Standalone caption
-            startExpression = currentStart;
-        } else if (caption.getRelativeReference() != null) {
-            // Relative reference
-            String referenceClip = caption.getRelativeReference();
-            String startTime;
-            if (caption.getOffset() > 0) {
-                startTime = getClipEndTime(referenceClip, video) + " + " + caption.getOffset();
-            } else {
-                startTime = getClipStartTime(referenceClip, video) + caption.getOffset();
-            }
-            startExpression = String.format("%s + %d", startTime, caption.getStartTime());
-        } else {
-            // Tied to a clip
-            startExpression = String.format("%s.start + %d", caption.getClipName(), caption.getStartTime());
-        }
-
-        w(String.format(
-                "caption%d = (TextClip(text=\"%s\", font=font, font_size=48, color='white')"
-                        + ".with_duration(%d)"
-                        + ".with_position('center')"
-                        + ".with_start(%s))\n",
-                captionIndex, caption.getText(), caption.getDuration(), startExpression
-        ));
-        w(String.format("final_clips.append(caption%d)\n", captionIndex));
-
-        // Only update currentStart when caption is standalone
-        if (caption.getClipName() == null && caption.getRelativeReference() == null) {
-            currentStart = String.format("caption%d.end", captionIndex);
-        }
-        captionIndex++;
+        // w(String.format("final_clips.append(%s)\n", clipCut.getName()));
+        // currentStart = String.format("%s.end", clipCut.getName());
     }
 
     @Override

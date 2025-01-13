@@ -1,4 +1,10 @@
-project Holidays
+Project test
 
-import first_clip "first_clip.mp4"
-import second_clip "second_clip.mp4"
+cut "first_clip.mp4" from 0s to 5s as clip1
+cut "first_clip.mp4" from 5s to 10s as clip2
+
+stack clip2 on clip1 at (left, bottom) scale 0.2
+
+# combine clip1 and clip2 as video
+
+# caption "Titre video" on video wait 2s as text

@@ -3,7 +3,7 @@ package org.videoML.kernel;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
 
-public class Caption implements TimelineElement, Visitable {
+public class Caption implements TimelineElement {
     private String text;
     private int duration;
     private String clipName;
@@ -94,10 +94,5 @@ public class Caption implements TimelineElement, Visitable {
                 ", offset=" + offset +
                 ", relativeReference='" + relativeReference + '\'' +
                 '}';
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
 }

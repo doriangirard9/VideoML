@@ -9,6 +9,7 @@ statements      : statement+;
 
 statement       : caption
                 | combine
+                | add
                 | cut
                 | stack
                 | transition
@@ -21,19 +22,24 @@ statement       : caption
                 | concatenate
                 ;
 
-caption         : 'caption' STRING ('on' IDENTIFIER)? (duration | offset | offsetWithDuration)? ;
+add             : 'add' video ('and' video)* ;
+
+video           : STRING ('as' IDENTIFIER)? ;
+
+caption         : 'caption' STRING (offset | duration) ('as' IDENTIFIER)? ;
+
+offset          : 'on' variable ('wait' time)? (duration)? ;
 
 duration        : 'for' time ;
-offset          : 'from' from=time 'to' to=time
-                | NUMBER 's' ('after' after=(IDENTIFIER | STRING) | 'before' before=(IDENTIFIER | STRING))? ;
-offsetWithDuration
-    : offset duration ;
 
-combine         : 'combine' STRING ('and' STRING)+ ;
+variable        : STRING 
+                | IDENTIFIER ;
 
-cut             : 'cut' STRING 'from' time 'to' time 'as' IDENTIFIER ;
+combine         : 'combine' variable ('and' variable)+ 'as' IDENTIFIER ;
 
-stack           : 'stack' STRING 'on' STRING ('at' '(' position ',' position ')')? ('scale' FLOAT)?;
+cut             : 'cut' variable 'from' time 'to' time ('as' name=IDENTIFIER)? ;
+
+stack           : 'stack' variable 'on' variable ('at' '(' position ',' position ')')? ('scale' FLOAT)?;
 
 transition      : 'transition' STRING 'on' IDENTIFIER 'duration' time ;
 
