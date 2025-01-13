@@ -1,9 +1,6 @@
 package org.videoML.kernel.generator;
 
-import org.videoML.kernel.Caption;
 import org.videoML.kernel.Video;
-import org.videoML.kernel.clips.Clip;
-import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.video.CompositeVideoClip;
 import org.videoML.kernel.clips.video.CutVideoClip;
@@ -25,7 +22,6 @@ public abstract class Visitor<T> {
     public abstract void visit(TextClip textClip);
     public abstract void visit(CompositeVideoClip compositeVideoClip);
 
-    public abstract void visit(CutClip cutClip);
     public abstract void visit(Transition transition);
 
     /****************************************

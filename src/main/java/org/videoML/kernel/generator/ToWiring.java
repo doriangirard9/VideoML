@@ -1,26 +1,20 @@
 package org.videoML.kernel.generator;
 
-import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
-import org.videoML.kernel.clips.CutClip;
 import org.videoML.kernel.clips.Transition;
 import org.videoML.kernel.clips.video.CompositeVideoClip;
 import org.videoML.kernel.clips.video.CutVideoClip;
 import org.videoML.kernel.clips.video.TextClip;
 import org.videoML.kernel.clips.video.VideoClip;
-import org.videoML.kernel.Caption;
 import org.videoML.kernel.effects.Blur;
 import org.videoML.kernel.effects.Effect;
 import org.videoML.kernel.effects.Freeze;
 import org.videoML.kernel.effects.Resize;
 
-import java.util.Optional;
-
 
 public class ToWiring extends Visitor<StringBuffer> {
     private String currentStart = "0";
-    private Video video;
 
     public ToWiring() {
         this.result = new StringBuffer();
@@ -32,7 +26,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Video video) {
-        this.video = video;
         w("# Code generated from a VideoML scrip\n");
         w(String.format("# Video name: %s\n", video.getName()) + "\n");
 
@@ -140,36 +133,6 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     @Override
-    public void visit(CutClip clipCut) {
-        // w(String.format("%s = VideoFileClip(\"%s\").subclipped(%s, %s).with_start(%s)\n",
-        //         clipCut.getName(), clipCut.getSourcePath(),
-        //         clipCut.getStartTime().replace("s", ""),
-        //         clipCut.getEndTime().replace("s", ""),
-        //         currentStart));
-
-        // for (Transition transition : clipCut.getTransitions()) {
-        //     this.visit(transition);
-        // }
-
-        // for(Effect effect: clipCut.getEffects()){
-        //     switch(effect.getEffectName()){
-        //         case "freeze":
-        //             Freeze freeze = (Freeze) effect;
-        //             this.visit(freeze);
-        //             break;
-        //         case "blur":
-        //             Blur blur = (Blur) effect;
-        //             this.visit(blur);
-        //             break;
-        //     }
-        // }
-
-
-        // w(String.format("final_clips.append(%s)\n", clipCut.getName()));
-        // currentStart = String.format("%s.end", clipCut.getName());
-    }
-
-    @Override
     public void visit(Transition transition) {
         String transitionEffect = "";
         switch (transition.getType()) {
@@ -199,8 +162,6 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("%s = %s.with_effects([%s])\n",
                     targetClip, targetClip, freezeEffect));
             // We need to re-set the start/end timers after applying an effect
-
-            resetStartTime(targetClip);
         }
     }
 
@@ -223,56 +184,5 @@ public class ToWiring extends Visitor<StringBuffer> {
             w(String.format("%s = %s.resized(width=%d, height=%d)\n",
                     targetClip, targetClip, resize.getWidth(), resize.getHeight()));
         }
-
-        resetStartTime(targetClip);
-    }
-
-    private String getClipTime(String clipName, Video video, boolean isStartTime) {
-        int captionIndex = 1;
-        for (TimelineElement element : video.getTimeline()) {
-            if (element instanceof Clip) {
-                if (element.getName().equals(clipName)) {
-                    return element.getName() + (isStartTime ? ".start" : ".end");
-                }
-            } else if (element instanceof Caption) {
-                Caption caption = (Caption) element;
-                if (clipName.contains(caption.getText())) {
-                    return String.format("caption%d.%s", captionIndex, isStartTime ? "start" : "end");
-                }
-                captionIndex++;
-            }
-        }
-        return null;
-    }
-
-    private String getClipStartTime(String clipName, Video video) {
-        return getClipTime(clipName, video, true);
-    }
-
-    private String getClipStartTime(String clipName){
-        // We get the clip from the Video object
-        Optional<Clip> clip = video.getTimeline().stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
-                .map(e -> (Clip) e)
-                .findFirst();
-
-        if(clip.isPresent()){
-            return clip.get().getStartTime();
-        } else {
-            throw new RuntimeException("Clip not found: " + clipName);
-        }
-    }
-
-    private String getClipEndTime(String clipName, Video video) {
-        return getClipTime(clipName, video, false);
-    }
-
-    public void resetStartTime(String targetClip){
-        String startTime = getClipStartTime(targetClip);
-        if(startTime == null)
-            startTime = currentStart;
-
-        w(String.format("%s = %s.with_start(%s).with_end(%s.end)\n",
-                targetClip, targetClip, startTime.replace("s", ""), targetClip));
     }
 }

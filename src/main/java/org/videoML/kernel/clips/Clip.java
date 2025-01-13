@@ -1,6 +1,5 @@
 package org.videoML.kernel.clips;
 
-import org.videoML.kernel.TimelineElement;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.effects.Effect;
 import org.videoML.kernel.generator.Visitable;
@@ -8,7 +7,7 @@ import org.videoML.kernel.generator.Visitable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Clip implements Visitable, TimelineElement {
+public abstract class Clip implements Visitable {
     private String name;
     private String source = null;
     protected String startTime = null;

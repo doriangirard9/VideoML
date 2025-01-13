@@ -46,7 +46,7 @@ public class Video implements Visitable {
 
     public void addTransition(String clipName, String effectName, int duration) {
         Optional<Clip> clip = timeline.stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .filter(e -> (e instanceof VideoClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)
                 .findFirst();
 
@@ -62,7 +62,7 @@ public class Video implements Visitable {
         // We can only freeze video clips (or cutclips)
         System.out.println("ADDING FREEZE EFFECT TO CLIP: " + clipName + " WITH TIMER: " + timer + " AND DURATION: " + duration);
         Optional<Clip> clip = timeline.stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .filter(e -> (e instanceof VideoClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)
                 .findFirst();
 
@@ -77,7 +77,7 @@ public class Video implements Visitable {
     public void addResize(String clipName, int width, int height, double scale) {
         System.out.println("VIDEO.JAVA ADDING RESIZE EFFECT TO CLIP: " + clipName + " WITH SCALE: " + scale + " AND DIMENSIONS: " + width + "x" + height);
         Optional<Clip> clip = timeline.stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .filter(e -> (e instanceof VideoClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)
                 .findFirst();
 
@@ -99,7 +99,7 @@ public class Video implements Visitable {
 
     public String getStartTimeForClip(String clipName) {
         Optional<Clip> clip = timeline.stream()
-                .filter(e -> (e instanceof VideoClip || e instanceof CutClip) && (e.getName().equals(clipName)))
+                .filter(e -> (e instanceof VideoClip) && (e.getName().equals(clipName)))
                 .map(e -> (Clip) e)
                 .findFirst();
 
