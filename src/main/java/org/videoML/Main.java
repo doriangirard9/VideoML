@@ -9,6 +9,7 @@ import org.videoML.kernel.generator.ToWiring;
 import org.videoML.kernel.generator.Visitor;
 import org.videoML.videoml.grammar.ModelBuilder;
 import org.videoML.videoml.grammar.StopErrorListener;
+import org.videoML.videoml.grammar.exceptions.PreviewException;
 import videoml.grammar.VideoMLLexer;
 import videoml.grammar.VideoMLParser;
 
@@ -58,7 +59,11 @@ public class Main {
         ParseTreeWalker walker  = new ParseTreeWalker();
         ModelBuilder      builder = new ModelBuilder();
 
-        walker.walk(builder, parser.root()); // parser.root() is the entry point of the grammar
+        try {
+            walker.walk(builder, parser.root()); // parser.root() is the entry point of the grammar
+        } catch (PreviewException e) {
+            System.out.println("Skipping because of preview");
+        }
 
         return builder.retrieve();
     }

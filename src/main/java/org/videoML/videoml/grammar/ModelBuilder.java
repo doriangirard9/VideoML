@@ -1,10 +1,7 @@
 package org.videoML.videoml.grammar;
 
 import org.videoML.kernel.Video;
-import org.videoML.kernel.clips.video.CompositeVideoClip;
-import org.videoML.kernel.clips.video.CutVideoClip;
-import org.videoML.kernel.clips.video.TextClip;
-import org.videoML.kernel.clips.video.VideoClip;
+import org.videoML.kernel.clips.video.*;
 import org.videoML.kernel.effects.video.Crop;
 import org.videoML.kernel.effects.video.Freeze;
 import org.videoML.kernel.effects.video.Resize;
@@ -13,6 +10,7 @@ import org.videoML.kernel.effects.video.SpeedChanger;
 import org.videoML.kernel.effects.video.Transition;
 import org.videoML.kernel.effects.video.TransitionType;
 
+import org.videoML.videoml.grammar.exceptions.PreviewException;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
 
@@ -229,6 +227,16 @@ public class ModelBuilder extends VideoMLBaseListener {
         Resize foregroundClipResize = new Resize(scale, foregroundClip.getName());
         foregroundClip.addEffect(foregroundClipResize);
         foregroundClip.setStartTime(String.format("%s.start", backgroundClip.getName()));
+    }
+
+    @Override
+    public void enterPreview(VideoMLParser.PreviewContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText() != null ? ctx.IDENTIFIER().getText() : null;
+        PreviewClip previewClip = new PreviewClip(clipName);
+        video.addTimelineElement(previewClip);
+        video.setPreview(true);
+        this.built = true;
+        throw new PreviewException("Previewing the video so skipping the rest of the parsing");
     }
 
     @Override

@@ -1,9 +1,11 @@
 Project stacking at 12fps
 
-cut "second_clip.mp4" from 0s to 1s as clip1
+cut "second_clip.mp4" from 0s to 5s as clip1
 add "second_clip.mp4" as clip2
-add "second_clip.mp4" as clip3
-add "second_clip.mp4" as clip4
+
+slow clip2 by 50%
+
+preview clip2
 
 stack clip4 on clip3 at (left, bottom) scale 0.5
 combine clip3 and clip4 as sub_clip

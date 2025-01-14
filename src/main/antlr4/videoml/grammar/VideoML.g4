@@ -21,6 +21,7 @@ statement       : caption
                 | rotate
                 | slow
                 | accelerate
+                | preview
                 ;
 
 time             : NUMBER 's' ;
@@ -45,6 +46,8 @@ combine         : 'combine' variable ('and' variable)+ 'as' IDENTIFIER ;
 cut             : 'cut' variable 'from' time 'to' time ('as' name=IDENTIFIER)? ;
 
 stack           : 'stack' variable 'on' variable ('at' '(' position ',' position ')')? ('scale' FLOAT)? ;
+
+preview         : 'preview' (IDENTIFIER)? ;
 
 // Audio
 overlay         : 'overlay' IDENTIFIER 'on' STRING 'at' timestamp ('as' IDENTIFIER)? ;

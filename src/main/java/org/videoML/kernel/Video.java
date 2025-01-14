@@ -13,6 +13,7 @@ public class Video implements Visitable {
     private int width = 1280;
     private int height = 720;
     private static final String FINAL_CLIP_NAME = "final_clip";
+    private boolean isPreview = false;
     
     private List<String> combineClipList = new ArrayList<>(Collections.singletonList(FINAL_CLIP_NAME));
     private List<Clip> timeline = new ArrayList<>();
@@ -34,7 +35,10 @@ public class Video implements Visitable {
     public void addCombineClip(String clipName) { combineClipList.add(clipName); }
 
     public static String getFinalClipName() { return FINAL_CLIP_NAME; }
-    
+
+    public boolean isPreview() { return isPreview; }
+    public void setPreview(boolean preview) { isPreview = preview; }
+
     public List<Clip> getTimeline() { return timeline; }
     public void addTimelineElement(Clip clip) { timeline.add(clip); }
     

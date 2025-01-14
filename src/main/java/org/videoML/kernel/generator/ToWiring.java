@@ -2,10 +2,7 @@ package org.videoML.kernel.generator;
 
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
-import org.videoML.kernel.clips.video.CompositeVideoClip;
-import org.videoML.kernel.clips.video.CutVideoClip;
-import org.videoML.kernel.clips.video.TextClip;
-import org.videoML.kernel.clips.video.VideoClip;
+import org.videoML.kernel.clips.video.*;
 import org.videoML.kernel.effects.*;
 import org.videoML.kernel.effects.video.Crop;
 import org.videoML.kernel.effects.video.Freeze;
@@ -17,6 +14,7 @@ import org.videoML.kernel.effects.video.TransitionType;
 
 public class ToWiring extends Visitor<StringBuffer> {
     private String currentStart = "0";
+    private Video video;
 
     public ToWiring() {
         this.result = new StringBuffer();
@@ -28,6 +26,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(Video video) {
+        this.video = video;
         w("# Code generated from a VideoML scrip\n");
         w(String.format("# Video name: %s\n", video.getName()) + "\n");
 
@@ -46,9 +45,11 @@ public class ToWiring extends Visitor<StringBuffer> {
             clip.accept(this);
         }
 
-        w(String.format("%s = CompositeVideoClip(%s_list, size=(video_width, video_height))\n", Video.getFinalClipName(), Video.getFinalClipName()));
-        w(String.format("%s.write_videofile(\"%s.mp4\", codec=\"libx264\", fps=%d)\n", 
-                Video.getFinalClipName(), video.getName(), video.getFps()));
+        if (!video.isPreview()) {
+            w(String.format("%s = CompositeVideoClip(%s_list, size=(video_width, video_height))\n", Video.getFinalClipName(), Video.getFinalClipName()));
+            w(String.format("%s.write_videofile(\"%s.mp4\", codec=\"libx264\", fps=%d)\n",
+                    Video.getFinalClipName(), video.getName(), video.getFps()));
+        }
     }
 
     @Override
@@ -81,7 +82,7 @@ public class ToWiring extends Visitor<StringBuffer> {
         for (Effect effect : cutVideoClip.getEffects()) {
             effect.accept(this);
         }
-        
+
         w(String.format("%s_list.append(%s)\n", cutVideoClip.getParent(), cutVideoClip.getName()));
         currentStart = String.format("%s.end", cutVideoClip.getName());
     }
@@ -128,7 +129,19 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("%s_list.append(%s)\n", compositeVideoClip.getParent(), compositeVideoClip.getName()));
         currentStart = String.format("%s.end", compositeVideoClip.getName());
     }
-    
+
+    @Override
+    public void visit(PreviewClip previewClip) {
+        String name = "";
+        if (previewClip.getName() != null) {
+            name = previewClip.getName();
+        } else {
+            name = Video.getFinalClipName();
+            w(String.format("%s = CompositeVideoClip(%s_list, size=(video_width, video_height))\n", Video.getFinalClipName(), Video.getFinalClipName()));
+        }
+        w(String.format("%s.preview(fps=%s)\n", name, this.video.getFps()));
+    }
+
     @Override
     public void visit(Resize resize) {
         String targetClip = resize.getClipName();

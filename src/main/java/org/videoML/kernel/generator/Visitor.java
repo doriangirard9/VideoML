@@ -1,10 +1,7 @@
 package org.videoML.kernel.generator;
 
 import org.videoML.kernel.Video;
-import org.videoML.kernel.clips.video.CompositeVideoClip;
-import org.videoML.kernel.clips.video.CutVideoClip;
-import org.videoML.kernel.clips.video.TextClip;
-import org.videoML.kernel.clips.video.VideoClip;
+import org.videoML.kernel.clips.video.*;
 import org.videoML.kernel.effects.video.Crop;
 import org.videoML.kernel.effects.video.Freeze;
 import org.videoML.kernel.effects.video.Resize;
@@ -23,6 +20,7 @@ public abstract class Visitor<T> {
     public abstract void visit(CutVideoClip cutVideoClip);
     public abstract void visit(TextClip textClip);
     public abstract void visit(CompositeVideoClip compositeVideoClip);
+    public abstract void visit(PreviewClip previewClip);
 
     /****************************************
      ** Effects
