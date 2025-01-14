@@ -4,6 +4,7 @@ import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.video.*;
 import org.videoML.kernel.effects.video.Crop;
 import org.videoML.kernel.effects.video.Freeze;
+import org.videoML.kernel.effects.video.GreenScreen;
 import org.videoML.kernel.effects.video.Resize;
 import org.videoML.kernel.effects.video.Rotate;
 import org.videoML.kernel.effects.video.SpeedChanger;
@@ -33,6 +34,7 @@ public abstract class Visitor<T> {
     public abstract void visit(SpeedChanger speedChanger);
     public abstract void visit(Freeze freeze);
     public abstract void visit(Crop crop);
+    public abstract void visit(GreenScreen greenScreen);
 
     /***********************
      ** Helper mechanisms **

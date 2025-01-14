@@ -3,14 +3,8 @@ package org.videoML.kernel.generator;
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.Clip;
 import org.videoML.kernel.clips.video.*;
-import org.videoML.kernel.effects.*;
-import org.videoML.kernel.effects.video.Crop;
-import org.videoML.kernel.effects.video.Freeze;
-import org.videoML.kernel.effects.video.Resize;
-import org.videoML.kernel.effects.video.Rotate;
-import org.videoML.kernel.effects.video.SpeedChanger;
-import org.videoML.kernel.effects.video.Transition;
-import org.videoML.kernel.effects.video.TransitionType;
+import org.videoML.kernel.effects.Effect;
+import org.videoML.kernel.effects.video.*;
 
 public class ToWiring extends Visitor<StringBuffer> {
     private String currentStart = "0";
@@ -245,5 +239,15 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         w(String.format("%s = %s.with_effects([%s])\n",
                 targetClip, targetClip, cropEffect));
+    }
+
+    @Override
+    public void visit(GreenScreen greenScreen) {
+        String targetClip = greenScreen.getClipName();
+        String greenScreenEffect = String.format(
+                "vfx.MaskColor(color=(0, 255, 8), threshold=%d, stiffness=5)", greenScreen.getThreshold());
+
+        w(String.format("%s = %s.with_effects([%s])\n",
+                targetClip, targetClip, greenScreenEffect));
     }
 }

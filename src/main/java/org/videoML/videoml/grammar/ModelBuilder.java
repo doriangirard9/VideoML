@@ -2,13 +2,7 @@ package org.videoML.videoml.grammar;
 
 import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.video.*;
-import org.videoML.kernel.effects.video.Crop;
-import org.videoML.kernel.effects.video.Freeze;
-import org.videoML.kernel.effects.video.Resize;
-import org.videoML.kernel.effects.video.Rotate;
-import org.videoML.kernel.effects.video.SpeedChanger;
-import org.videoML.kernel.effects.video.Transition;
-import org.videoML.kernel.effects.video.TransitionType;
+import org.videoML.kernel.effects.video.*;
 
 import org.videoML.videoml.grammar.exceptions.PreviewException;
 import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
@@ -431,5 +425,21 @@ public class ModelBuilder extends VideoMLBaseListener {
 
         Crop cropEffect = new Crop(clipName, x1, y1, x2, y2);
         videoClip.addEffect(cropEffect);
+    }
+
+    public void enterGreenScreen(VideoMLParser.GreenScreenContext ctx) {
+        String clipName = ctx.IDENTIFIER().getText();
+        VideoClip videoClip = video.getVideoClip(clipName);
+
+        GreenScreen greenScreen = null;
+
+        if (ctx.NUMBER() != null) {
+            int threshold = Integer.parseInt(ctx.NUMBER().getText());
+            greenScreen = new GreenScreen(threshold, clipName);
+        }
+        else 
+            greenScreen = new GreenScreen(clipName);
+
+        videoClip.addEffect(greenScreen);
     }
 }

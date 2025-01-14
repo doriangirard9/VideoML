@@ -23,6 +23,7 @@ statement       : caption
                 | slow
                 | accelerate
                 | preview
+                | greenScreen
                 ;
 
 time             : NUMBER 's' ;
@@ -58,6 +59,8 @@ overlay         : 'overlay' IDENTIFIER 'on' STRING 'at' timestamp ('as' IDENTIFI
 adjustVolume    : 'adjust' 'volume' 'of' STRING 'to' NUMBER ;
 
 // Effects
+greenScreen     : 'green screen' IDENTIFIER ('treshold' NUMBER)? ;
+
 transition      : 'transition' (fadeIn='fadeIn' | fadeOut='fadeOut' | crossFadeIn='crossFadeIn' | crossFadeOut='crossFadeOut') 'on' IDENTIFIER 'duration' time ;
 
 crop            : 'crop' cropOptions 'of' IDENTIFIER ;

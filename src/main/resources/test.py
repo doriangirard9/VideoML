@@ -9,11 +9,14 @@ video_width = 1280
 video_height = 720
 
 final_clip_list = []
-clip1 = VideoFileClip("second_clip.mp4").subclipped(0, 5).with_start(0)
+clip1 = VideoFileClip("second_clip.mp4").with_start(0)
 clip1 = clip1.with_position(('center', 'center'))
 final_clip_list.append(clip1)
-clip2 = VideoFileClip("second_clip.mp4").with_start(clip1.end)
-clip2 = clip2.with_position(('center', 'center'))
-clip2 = clip2.with_effects([vfx.MultiplySpeed(0.5)])
-final_clip_list.append(clip2)
-clip2.preview(fps=12)
+effect = VideoFileClip("explosion.mp4").with_start(clip1.start)
+effect = effect.with_position(('center', 'center'))
+effect = effect.resized(2.0)
+effect = effect.resized(1.0)
+effect = effect.with_effects([vfx.MaskColor(color=(0, 255, 8), threshold=150, stiffness=5)])
+final_clip_list.append(effect)
+final_clip = CompositeVideoClip(final_clip_list, size=(video_width, video_height))
+final_clip.preview(fps=12)

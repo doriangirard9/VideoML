@@ -1,18 +1,8 @@
 Project stacking at 12fps
 
-cut "second_clip.mp4" from 0s to 5s as clip1
-add "second_clip.mp4" as clip2
-
-slow clip2 by 50%
-
-preview clip2
-
-stack clip4 on clip3 at (left, bottom) scale 0.5
-combine clip3 and clip4 as sub_clip
-
-stack sub_clip on clip2 at (left, bottom) scale 0.5
-combine clip2 and sub_clip as sub_clip2
-
-stack sub_clip2 on clip1 at (left, bottom) scale 0.5
-
-freeze clip1 at 1s for 4s
+add "second_clip.mp4" as clip1
+add "explosion.mp4" as effect
+resize effect to 200%
+stack effect on clip1
+green screen effect
+preview
