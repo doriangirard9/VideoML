@@ -163,6 +163,59 @@ public class ModelBuilder extends VideoMLBaseListener {
     }
 
     @Override
+    public void enterImage(VideoMLParser.ImageContext ctx) {
+        String imagePath = ctx.STRING().getText().replace("\"", "");
+
+        String clipName = null;
+        if (ctx.IDENTIFIER() != null)
+            clipName = ctx.IDENTIFIER().getText();
+        else
+            clipName = video.generateClipName();
+        
+        ImageClip imageClip = new ImageClip(clipName);
+        imageClip.setSource(imagePath);
+
+        // tied to a clip
+        if (ctx.offset() != null) {
+            String targetClipName = null;
+
+            // VideoClip variable
+            if (ctx.offset().variable().IDENTIFIER() != null)
+                targetClipName = ctx.offset().variable().IDENTIFIER().getText();
+            // VideoClip path
+            else {
+                String targetClipPath = ctx.offset().variable().STRING().getText().replace("\"", "");
+                VideoClip targetClip = new VideoClip(video.generateClipName(), getVideoClipNameFromPath(targetClipPath));
+                video.addTimelineElement(targetClip);
+                targetClipName = targetClip.getName();
+            }
+            imageClip.setTargetClip(targetClipName);
+
+            // delay
+            if (ctx.offset().time() != null) {
+                int delay = Integer.parseInt(ctx.offset().time().getText().replace("s", ""));
+                imageClip.setDelay(delay);
+            }
+
+            // duration
+            if (ctx.offset().duration() != null) {
+                int duration = Integer.parseInt(ctx.offset().duration().time().getText().replace("s", ""));
+                imageClip.setDuration(duration);
+            }
+        }
+        else {
+            int duration = Integer.parseInt(ctx.duration().time().getText().replace("s", ""));
+            imageClip.setDuration(duration);
+        }
+
+        System.out.printf(
+                "Adding image %s with path %s on clip %s with %d seconds delay and for %d seconds\n",
+                clipName, imagePath, imageClip.getTargetClip(), imageClip.getDelay(), imageClip.getDuration()
+        );
+        video.addTimelineElement(imageClip);
+    }
+
+    @Override
     public void enterCombine(VideoMLParser.CombineContext ctx) {
         String compositeClipName = ctx.IDENTIFIER().getText();
         CompositeVideoClip compositeClip = new CompositeVideoClip(compositeClipName);
@@ -268,8 +321,12 @@ public class ModelBuilder extends VideoMLBaseListener {
 
         if (ctx.fadeIn != null)
             transition = new Transition(TransitionType.FADEIN, duration, clipName);
-        else
+        else if (ctx.fadeOut != null)
             transition = new Transition(TransitionType.FADEOUT, duration, clipName);
+        else if (ctx.crossFadeIn != null)
+            transition = new Transition(TransitionType.CROSSFADEIN, duration, clipName);
+        else 
+            transition = new Transition(TransitionType.CROSSFADEOUT, duration, clipName);
 
         videoClip.addEffect(transition);
     }

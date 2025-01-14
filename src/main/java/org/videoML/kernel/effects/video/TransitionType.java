@@ -1,5 +1,5 @@
 package org.videoML.kernel.effects.video;
 
 public enum TransitionType {
-    FADEIN, FADEOUT
+    FADEIN, FADEOUT, CROSSFADEIN, CROSSFADEOUT
 }

@@ -111,7 +111,43 @@ public class ToWiring extends Visitor<StringBuffer> {
             currentStart = String.format("%s.end", textClip.getName());
         }
 
+        for (Effect effect : textClip.getEffects()) {
+            effect.accept(this);
+        }
+
         w(String.format("%s_list.append(%s)\n", textClip.getParent(), textClip.getName()));
+    }
+
+    @Override
+    public void visit(ImageClip imageClip) {
+        String duration = String.format("%d", imageClip.getDuration());
+        String startTime = currentStart;
+
+        if (imageClip.getTargetClip() != null) {
+            startTime = String.format("%s.start + %d", imageClip.getTargetClip(), imageClip.getDelay()); ;
+
+            // if duration is unset the image will sync with the target clip
+            if (imageClip.getDuration() == 0)
+                duration = String.format("%s.start + %s.end - %d", 
+                    imageClip.getTargetClip(), imageClip.getTargetClip(), imageClip.getDelay());
+        }
+
+        w(String.format("%s = ImageClip(\"%s\")"
+                + ".with_position('center')"
+                + ".with_start(%s)"
+                + ".with_duration(%s)\n",
+                imageClip.getName(), imageClip.getSource(), startTime, duration));
+
+        // Only update currentStart when imageClip is standalone        
+        if (imageClip.getTargetClip() == null) {
+            currentStart = String.format("%s.end", imageClip.getName());
+        }
+
+        for (Effect effect : imageClip.getEffects()) {
+            effect.accept(this);
+        }
+
+        w(String.format("%s_list.append(%s)\n", imageClip.getParent(), imageClip.getName()));
     }
 
     @Override
@@ -162,8 +198,12 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         if (transition.getType() == TransitionType.FADEIN)
             transitionEffect = String.format("vfx.FadeIn(%s)", transition.getDuration());
-        else 
+        else if (transition.getType() == TransitionType.FADEOUT)
             transitionEffect = String.format("vfx.FadeOut(%s)", transition.getDuration());
+        else if (transition.getType() == TransitionType.CROSSFADEIN)
+            transitionEffect = String.format("vfx.CrossFadeIn(%s)", transition.getDuration());
+        else if (transition.getType() == TransitionType.CROSSFADEOUT)
+            transitionEffect = String.format("vfx.CrossFadeOut(%s)", transition.getDuration());
 
         w(String.format("%s = %s.with_effects([%s])\n", 
             transition.getClipName(), transition.getClipName(), transitionEffect));

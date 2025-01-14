@@ -21,6 +21,7 @@ public abstract class Visitor<T> {
     public abstract void visit(TextClip textClip);
     public abstract void visit(CompositeVideoClip compositeVideoClip);
     public abstract void visit(PreviewClip previewClip);
+    public abstract void visit(ImageClip imageClip);
 
     /****************************************
      ** Effects

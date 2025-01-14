@@ -8,6 +8,7 @@ projectName     : 'Project' IDENTIFIER ('at' NUMBER 'fps')? ('resolution' dimens
 statements      : statement+;
 
 statement       : caption
+                | image
                 | combine
                 | add
                 | cut
@@ -37,6 +38,8 @@ video           : STRING ('as' IDENTIFIER)? ;
 
 caption         : 'caption' STRING (offset | duration) ('as' IDENTIFIER)? ;
 
+image           : 'image' STRING (offset | duration) ('as' IDENTIFIER)? ;
+
 offset          : 'on' variable ('wait' time)? (duration)? ;
 
 duration        : 'for' time ;
@@ -55,7 +58,7 @@ overlay         : 'overlay' IDENTIFIER 'on' STRING 'at' timestamp ('as' IDENTIFI
 adjustVolume    : 'adjust' 'volume' 'of' STRING 'to' NUMBER ;
 
 // Effects
-transition      : 'transition' (fadeIn='fadeIn' | fadeOut='fadeOut') 'on' IDENTIFIER 'duration' time ;
+transition      : 'transition' (fadeIn='fadeIn' | fadeOut='fadeOut' | crossFadeIn='crossFadeIn' | crossFadeOut='crossFadeOut') 'on' IDENTIFIER 'duration' time ;
 
 crop            : 'crop' cropOptions 'of' IDENTIFIER ;
 
