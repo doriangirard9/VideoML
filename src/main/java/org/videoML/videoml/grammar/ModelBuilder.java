@@ -284,7 +284,7 @@ public class ModelBuilder extends VideoMLBaseListener {
 
     @Override
     public void enterPreview(VideoMLParser.PreviewContext ctx) {
-        String clipName = ctx.IDENTIFIER().getText() != null ? ctx.IDENTIFIER().getText() : null;
+        String clipName = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
         PreviewClip previewClip = new PreviewClip(clipName);
         video.addTimelineElement(previewClip);
         video.setPreview(true);
