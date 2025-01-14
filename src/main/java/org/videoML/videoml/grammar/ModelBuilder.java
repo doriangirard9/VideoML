@@ -11,6 +11,9 @@ import org.videoML.kernel.effects.video.Transition;
 import org.videoML.kernel.effects.video.TransitionType;
 
 import org.videoML.videoml.grammar.exceptions.PreviewException;
+import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
+import org.videoML.videoml.grammar.exceptions.VideoTimeException;
+import org.videoML.videoml.grammar.helpers.VideoHelper;
 import videoml.grammar.VideoMLBaseListener;
 import videoml.grammar.VideoMLParser;
 
@@ -20,6 +23,10 @@ public class ModelBuilder extends VideoMLBaseListener {
     private boolean built = false;
 
     private String getVideoClipNameFromPath(String path) {
+        if (!VideoHelper.isValidExtension(path)) {
+            throw new VideoExtensionException(VideoExtensionException.buildMessage(path));
+        }
+
         return String.format("VideoFileClip(\"%s\")", path);
     }
 
@@ -88,9 +95,10 @@ public class ModelBuilder extends VideoMLBaseListener {
             clipName = video.generateClipName();
 
         String targetName;
+        String targetClipPath = "";
         // Path to a clip
         if (ctx.variable().STRING() != null) {
-            String targetClipPath = ctx.variable().STRING().getText().replace("\"", "");
+            targetClipPath = ctx.variable().STRING().getText().replace("\"", "");
             targetName = getVideoClipNameFromPath(targetClipPath);
         }
         // VideoClip variable
@@ -104,6 +112,10 @@ public class ModelBuilder extends VideoMLBaseListener {
         String endTime = ctx.time(1).getText();
         cutVideoClip.setStart(startTime);
         cutVideoClip.setEnd(endTime);
+
+        if (!targetClipPath.isEmpty() && !VideoHelper.isValidTiming(targetClipPath, startTime, endTime)) {
+            throw new VideoTimeException(VideoTimeException.buildMessage(targetClipPath, startTime, endTime));
+        }
 
         System.out.println("Cutting clip: " + cutVideoClip.getSource() + " from " + startTime + " to " + endTime + " as " + cutVideoClip.getName());
         video.addTimelineElement(cutVideoClip);

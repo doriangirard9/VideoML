@@ -38,7 +38,7 @@ public class VideoHelper {
         return videoMetadata;
     }
 
-    public static boolean checkExtension(String path) {
+    public static boolean isValidExtension(String path) {
         String extension = path.substring(path.lastIndexOf('.'));
         for (VideoExtension videoExtension : VideoExtension.values()) {
             if (videoExtension.label.equals(extension)) {
@@ -48,7 +48,7 @@ public class VideoHelper {
         return false;
     }
 
-    public static boolean checkTime(String path, String startTime, String endTime) {
+    public static boolean isValidTiming(String path, String startTime, String endTime) {
         VideoMetadata videoMetadata = getMetadata(path);
         double duration = videoMetadata.getDuration();
 

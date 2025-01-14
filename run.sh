@@ -3,11 +3,12 @@
 # Check if the file name is provided
 if [ -z "$1" ]; then
   echo "Error: No file name provided."
-  echo "Usage: $0 <FILE_NAME>"
+  echo "Usage: $0 <FILE_NAME> [build]"
   exit 1
 fi
 
 FILE_NAME=$1
+BUILD=${2:-}
 
 # Check if the file exists in the resources directory
 if [ ! -f "src/main/resources/$FILE_NAME.videoml" ]; then
@@ -26,13 +27,17 @@ if ! command -v python3 &> /dev/null ; then
   exit 1
 fi
 
-
-# Compile ANTLR4 grammar
-if mvn clean package ; then
-  echo "Compilation successful."
+# Run mvn clean package if '--build' argument is provided
+if [ "$BUILD" = "--build" ]; then
+  echo "Building the project..."
+  if mvn clean package ; then
+    echo "Build successful."
+  else
+    echo "Build failed."
+    exit 1
+  fi
 else
-  echo "Compilation failed."
-  exit 1
+  echo "Skipping build step. Use '--build' argument to trigger the build."
 fi
 
 # Execute the code with the given arguments
@@ -45,7 +50,7 @@ fi
 
 # Execute the generated code
 cd src/main/resources
-if python3 $FILE_NAME.py ; then
+if python3 "$FILE_NAME.py" ; then
   echo "Execution successful."
 else
   echo "Execution failed."
