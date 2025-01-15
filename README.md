@@ -15,6 +15,24 @@
 pip3 install -r requirements.txt
 ```
 
+### Writing a video montage
+
+Create a `.videoml` file in the `src/main/resources` folder. Add all the sources (videos, images, sounds...) to the same folder.
+
+You can find examples in the `src/main/resources` folder or you can read the [documentation](DOCUMENTATION.md) to learn how to write a video montage using VideoML.
+
+### Using the script
+
+Run it with the scenario (an existing `.videoml` file in the `src/main/resources` folder) you want to test:
+
+```bash
+./run.sh scenario1 --build
+```
+
+The first time you run the script, you need to build the project with the `--build` flag. This will compile the ANTLR grammar and build the project.
+After that, you can run the script without the `--build` flag.
+
+
 ### By hand
 
 Compile the ANTLR grammar :
@@ -27,14 +45,9 @@ Run the compiler using the `exec` plugin:
 mvn exec:java -Dexec.args="src/main/resources/test.videoml"
 ```
 
-Run the python script to generate the video: (sources must be in the same directory as the script)
+Run the python script to generate the video:
 ```bash
 cd src/main/resources
 python3 test.py
 ```
 
-### Using the script
-
-```bash
-./run.sh scenario1
-```

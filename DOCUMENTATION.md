@@ -132,8 +132,145 @@ Naming a clip allows you to reference it later in the project.
 ... as some_name
 ```
 
-## Video effects
+## Video Effects
+You can apply various effects to your video clips using the provided keywords.
 
-## Audio clips
+### Cropping
+You can crop a video clip using the `crop` keyword.
 
-## Audio effects
+**Parameters**
+- clipName: `string` or `VideoClip`
+- options:
+  - `all`: Crop all sides equally by a percentage.
+  - `leftRight` and `topBottom`: Crop left-right and top-bottom by different percentages.
+  - Individual sides (`left`, `top`, `right`, `bottom`): Crop specific sides by a percentage.
+
+**Examples**
+```
+# Crop all sides by 10%
+crop 10% of some_clip
+
+# Crop specific sides
+crop left 5% top 10% right 5% bottom 10% of some_clip
+```
+
+### Freezing
+You can freeze a frame in a video clip using the `freeze` keyword.
+
+**Parameters**
+- clipName: `string` or `VideoClip`
+- start: `time`
+- duration: `time`
+
+**Examples**
+```
+# Freeze a frame at 5s for 3s
+freeze some_clip at 5s for 3s
+```
+
+### Resizing
+Resize a video clip using the `resize` keyword.
+
+**Parameters**
+- clipName: `string` or `VideoClip`
+- size:
+  - `dimensions`: Width and height in pixels.
+  - `percentage`: Resize by a percentage.
+
+**Examples**
+```
+# Resize to specific dimensions
+resize some_clip to 1920x1080
+
+# Resize by percentage
+resize some_clip to 50%
+```
+
+### Rotating
+You can rotate a video clip using the `rotate` keyword.
+
+**Parameters**
+- clipName: `string` or `VideoClip`
+- degrees: `int`
+
+**Examples**
+```
+# Rotate a clip by 90 degrees
+rotate some_clip by 90
+```
+
+### Speed Adjustments
+You can adjust the speed of a clip using `slow` or `accelerate`.
+
+**Parameters**
+- clipName: `string` or `VideoClip`
+- percentage: `float`
+
+**Examples**
+```
+# Slow down a clip by 50%
+slow some_clip by 50%
+
+# Speed up a clip by 150%
+accelerate some_clip by 150%
+```
+
+### Transitions
+Add transitions between clips using the `transition` keyword.
+
+**Parameters**
+- type: `fadeIn`, `fadeOut`, `crossFadeIn`, `crossFadeOut`
+- clipName: `string` or `VideoClip`
+- duration: `time`
+
+**Examples**
+```
+# Fade in transition
+transition fadeIn on some_clip duration 2s
+```
+
+### Green Screen
+Apply a green screen effect using the `green screen` keyword.
+
+**Parameters**
+- clipName: `string` or `VideoClip`
+- threshold: `float` (optional)
+
+**Examples**
+```
+# Apply green screen effect
+green screen some_clip threshold 0.5
+```
+
+---
+
+## Audio Clips
+You can overlay audio clips onto your videos using the `overlay` keyword.
+
+**Parameters**
+- audioFile: `string` = Path to the audio file (.mp3 or .wav).
+- clipName: `string` or `VideoClip`
+- timestamp: `TIME`
+
+**Examples**
+```
+# Overlay audio at a specific timestamp
+overlay "audio.mp3" on some_clip at 00:00:10
+```
+
+---
+
+## Audio Effects
+
+### Adjust Volume
+Adjust the volume of an audio file using the `adjust volume` keyword.
+
+**Parameters**
+- audioFile: `string`
+- volume: `int`
+
+**Examples**
+```
+# Set volume to 80
+adjust volume of "audio.mp3" to 80
+```
