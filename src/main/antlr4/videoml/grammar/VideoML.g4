@@ -54,9 +54,13 @@ stack           : 'stack' variable 'on' variable ('at' '(' position ',' position
 preview         : 'preview' (IDENTIFIER)? ;
 
 // Audio
-overlay         : 'overlay' IDENTIFIER 'on' STRING 'at' timestamp ('as' IDENTIFIER)? ;
+overlay         : 'overlay' variable fromAudioTime? 'on' variable fromVideoTime? ;
 
-adjustVolume    : 'adjust' 'volume' 'of' STRING 'to' NUMBER ;
+fromAudioTime : 'fromAudio' time 'forAudio' time ;
+
+fromVideoTime : 'fromVideo' time 'forVideo' time ;
+
+adjustVolume    : 'adjust' 'volume' 'of' variable 'to' percentage ;
 
 // Effects
 greenScreen     : 'green screen' IDENTIFIER ('treshold' NUMBER)? ;

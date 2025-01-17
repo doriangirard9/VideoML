@@ -1,3 +1,4 @@
+
 package org.videoML.kernel.clips;
 
 import org.videoML.kernel.Video;

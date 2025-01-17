@@ -2,8 +2,10 @@ package org.videoML.kernel;
 
 import org.videoML.kernel.clips.*;
 import org.videoML.kernel.clips.video.VideoClip;
+import org.videoML.kernel.clips.audio.AudioClip;
 import org.videoML.kernel.generator.Visitable;
 import org.videoML.kernel.generator.Visitor;
+
 
 import java.util.*;
 
@@ -57,6 +59,17 @@ public class Video implements Visitable {
             return (VideoClip) clip.get();
         else
             throw new RuntimeException("Clip not found: " + clipName);
+    }
+
+    public AudioClip getAudioClip (String audioName){
+        Optional<Clip> clip = timeline.stream()
+                .filter(c -> (c instanceof AudioClip) && c.getName().equals(audioName))
+                .findFirst();
+
+        if (clip.isPresent())
+            return (AudioClip) clip.get();
+        else
+            throw new RuntimeException("Clip not found: " + audioName);
     }
 
     @Override
