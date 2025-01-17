@@ -43,12 +43,17 @@ stack           : 'stack' variable 'on' variable ('at' '(' position ',' position
 
 transition      : 'transition' STRING 'on' IDENTIFIER 'duration' time ;
 
-overlay         : 'overlay' IDENTIFIER 'on' STRING 'at' timestamp ('as' IDENTIFIER)? ;
+overlay         : 'overlay' variable fromAudioTime? 'on' variable fromVideoTime? ;
+
+fromAudioTime : 'fromAudio' time 'forAudio' time ;
+
+fromVideoTime : 'fromVideo' time 'forVideo' time ;
+
 
 time             : NUMBER 's' ;
 timestamp        : TIME ;
 
-adjustVolume    : 'adjust' 'volume' 'of' STRING 'to' NUMBER ;
+adjustVolume    : 'adjust' 'volume' 'of' variable 'to' percentage ;
 
 blur            : 'blur' IDENTIFIER 'at' timestamp 'for' time ;
 
