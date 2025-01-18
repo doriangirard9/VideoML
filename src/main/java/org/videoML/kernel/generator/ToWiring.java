@@ -51,7 +51,7 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         for (Clip clip : video.getTimeline()) {
-            if (clip instanceof VideoClip) {
+            if (clip instanceof VideoClip || clip instanceof PreviewClip) {
                 clip.accept(this);
             }
         }
