@@ -342,7 +342,7 @@ public class ModelBuilder extends VideoMLBaseListener {
             throw e;
         }
 
-        System.out.printf("Adjusting volume of clip %s to %f%n", audioClipPath, volume);
+        System.out.printf("Adjusting volume of clip %s to %d%n", audioClipPath, volume);
     }
 
     @Override

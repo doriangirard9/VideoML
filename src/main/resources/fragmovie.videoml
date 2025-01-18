@@ -1,5 +1,8 @@
 Project fragmovie at 24fps resolution 640 x 360
 
+# Warning
+caption "Attention au volume" for 5s as warning
+
 # Intro x Explosions x Transitions
 add "intro.mp4" as intro
 caption "Fragmovie" on intro wait 2s for 8s as intro_text
@@ -25,15 +28,15 @@ green screen therock_nok threshold 100
 
 stack therock_ok1 on zywoo_gameplay wait 2s at (right, bottom) scale 0.4
 stack therock_ok2 on zywoo_gameplay wait 7s at (left, bottom) scale 0.4
-stack therock_nok on zywoo_gameplay wait 13s at (center, bottom) scale 0.4
+stack therock_nok on zywoo_gameplay wait 12s at (center, bottom) scale 0.4
 
-freeze zywoo_gameplay at 13s for 1s
+freeze zywoo_gameplay at 12s for 2s
 
-# Gameplay x Audio
-cut "gameplay.mp4" from 37s to 48s as monesy_gameplay
+# Gameplay x Audio x Image x Resize
+cut "gameplay.mp4" from 37s to 47s as monesy_gameplay
 overlay "background.mp3" fromAudio 25s forAudio 11s on monesy_gameplay fromVideo 0s forVideo 11s
 add "ohmygod.mp4" as ohmygod
-green screen ohmygod threshold 100
+green screen ohmygod threshold 150
 stack ohmygod on monesy_gameplay wait 2s at (center, bottom)
 image "shocked.png" on monesy_gameplay wait 5s at (right, top) as shocked
 resize shocked to 50%
@@ -43,7 +46,13 @@ caption "Hop on rigole" for 5s as hop_on_rigole
 transition crossFadeIn on hop_on_rigole duration 2s
 transition crossFadeOut on hop_on_rigole duration 2s
 
-# Shrek x Speedup x Audio
+# Shrek x Speedup x Audio x Resize
 add "shrek.mp4" as hrek
 accelerate hrek by 150%
+resize hrek to 640 x 360
 overlay "formula.mp3" on hrek
+adjust volume of "formula.mp3" to 200%
+
+# Outro x Credits
+caption "The End" for 5s as outro_text
+transition crossFadeIn on outro_text duration 2s
