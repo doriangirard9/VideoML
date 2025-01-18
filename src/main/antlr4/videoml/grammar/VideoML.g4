@@ -64,7 +64,7 @@ fromVideoTime : 'fromVideo' time 'forVideo' time ;
 adjustVolume    : 'adjust' 'volume' 'of' variable 'to' percentage ;
 
 // Effects
-greenScreen     : 'green screen' IDENTIFIER ('treshold' NUMBER)? ;
+greenScreen     : 'green screen' IDENTIFIER ('threshold' NUMBER)? ;
 
 transition      : 'transition' (fadeIn='fadeIn' | fadeOut='fadeOut' | crossFadeIn='crossFadeIn' | crossFadeOut='crossFadeOut') 'on' IDENTIFIER 'duration' time ;
 

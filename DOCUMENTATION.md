@@ -273,7 +273,7 @@ Apply a green screen effect using the `green screen` keyword.
 **Examples**
 ```
 # Apply green screen effect
-green screen some_clip threshold 0.5
+green screen some_clip threshold 150
 ```
 
 ---

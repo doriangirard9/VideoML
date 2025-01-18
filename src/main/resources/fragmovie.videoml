@@ -1,0 +1,26 @@
+Project fragmovie at 24fps resolution 640 x 360
+
+# Intro
+add "intro.mp4" as intro
+caption "Fragmovie" on intro wait 2s for 8s as intro_text
+transition crossFadeIn on intro_text duration 2s
+caption "Created by PADD" on intro wait 5s for 5s at (center, bottom) as intro_text_creator
+transition crossFadeIn on intro_text_creator duration 2s
+cut "explosion.mp4" from 0s to 3s as explosion_left
+cut "explosion.mp4" from 0s to 3s as explosion_right
+green screen explosion_left
+green screen explosion_right
+stack explosion_left on intro at (left, bottom) scale 0.3
+stack explosion_right on intro at (right, bottom) scale 0.3
+
+# Gameplay
+cut "gameplay.mp4" from 5s to 18s as zywoo_gameplay
+cut "therock.mp4" from 0s to 3s as therock_ok1
+cut "therock.mp4" from 0s to 3s as therock_ok2
+cut "therock.mp4" from 0s to 3s as therock_ok3
+cut "therock.mp4" from 3s to 4s as therock_nok
+
+
+green screen therock_ok1
+stack therock_ok1 on zywoo_gameplay at (right, bottom) scale 0.3
+
