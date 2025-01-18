@@ -68,14 +68,15 @@ public class ToWiring extends Visitor<StringBuffer> {
         boolean setCurrentStart = (videoClip.getStartTime() != null) ? false : true;
 
         String startTime = (videoClip.getStartTime() != null) ? videoClip.getStartTime() : currentStart;
-        w(String.format("%s = %s.with_start(%s)\n",
-            videoClip.getName(), videoClip.getSource(), startTime));
-        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
-            videoClip.getName(), videoClip.getName(), videoClip.getPositionX(), videoClip.getPositionY()));
 
         for (Effect effect : videoClip.getEffects()) {
             effect.accept(this);
         }
+
+        w(String.format("%s = %s.with_start(%s)\n",
+            videoClip.getName(), videoClip.getSource(), startTime));
+        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
+            videoClip.getName(), videoClip.getName(), videoClip.getPositionX(), videoClip.getPositionY()));
 
         for (Map.Entry<String, String> entry : compositeAudioSnippets.entrySet()) {
             String compositeName = entry.getKey();
@@ -221,17 +222,19 @@ public class ToWiring extends Visitor<StringBuffer> {
         boolean setCurrentStart = (cutVideoClip.getStartTime() != null) ? false : true;
 
         String startTime = (cutVideoClip.getStartTime() != null) ? cutVideoClip.getStartTime() : currentStart;
-        w(String.format("%s = %s.subclipped(%s, %s).with_start(%s)\n",
+        w(String.format("%s = %s.subclipped(%s, %s)\n",
                 cutVideoClip.getName(), cutVideoClip.getSource(),
                 cutVideoClip.getStart().replace("s", ""),
-                cutVideoClip.getEnd().replace("s", ""),
-                startTime));
-        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
-                cutVideoClip.getName(), cutVideoClip.getName(), cutVideoClip.getPositionX(), cutVideoClip.getPositionY()));
+                cutVideoClip.getEnd().replace("s", "")));
         
         for (Effect effect : cutVideoClip.getEffects()) {
             effect.accept(this);
         }
+
+        w(String.format("%s = %s.with_start(%s)\n",
+            cutVideoClip.getName(), cutVideoClip.getName(), startTime));
+        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
+                cutVideoClip.getName(), cutVideoClip.getName(), cutVideoClip.getPositionX(), cutVideoClip.getPositionY()));
 
         w(String.format("%s_list.append(%s)\n", cutVideoClip.getParent(), cutVideoClip.getName()));
 
