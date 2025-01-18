@@ -53,4 +53,3 @@ public abstract class Visitor<T> {
         return result;
     }
 }
-

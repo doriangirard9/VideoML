@@ -72,6 +72,7 @@ public class Video implements Visitable {
             throw new RuntimeException("Clip not found: " + audioName);
     }
 
+
     @Override
     public void accept(Visitor visitor) {
         visitor.visit(this);
