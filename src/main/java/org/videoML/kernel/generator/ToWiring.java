@@ -69,12 +69,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 
         String startTime = (videoClip.getStartTime() != null) ? videoClip.getStartTime() : currentStart;
 
+        w(String.format("%s = %s\n", videoClip.getName(), videoClip.getSource()));
+
         for (Effect effect : videoClip.getEffects()) {
             effect.accept(this);
         }
 
         w(String.format("%s = %s.with_start(%s)\n",
-            videoClip.getName(), videoClip.getSource(), startTime));
+            videoClip.getName(), videoClip.getName(), startTime));
         w(String.format("%s = %s.with_position(('%s', '%s'))\n",
             videoClip.getName(), videoClip.getName(), videoClip.getPositionX(), videoClip.getPositionY()));
 
