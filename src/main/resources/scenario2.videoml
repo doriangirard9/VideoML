@@ -8,6 +8,6 @@ cut "clip2.mp4" from 10s to 55s as clip1b
 caption "s1" on clip1a for 10s
 caption "s2" on clip1a wait 10s for 10s
 
-caption "s3" on clip1b wait 5s for 15s
+caption "s3" on clip1a wait 15s for 15s
 
 caption "thanks" for 10s

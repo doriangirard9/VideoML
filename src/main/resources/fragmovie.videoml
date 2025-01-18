@@ -21,6 +21,7 @@ cut "gameplay.mp4" from 5s to 18s as zywoo_gameplay
 cut "therock.mp4" from 0s to 3s as therock_ok1
 cut "therock.mp4" from 0s to 3s as therock_ok2
 cut "therock.mp4" from 3s to 4s as therock_nok
+transition fadeIn on zywoo_gameplay duration 2s
 
 green screen therock_ok1 threshold 100
 green screen therock_ok2 threshold 100
@@ -33,7 +34,7 @@ stack therock_nok on zywoo_gameplay wait 12s at (center, bottom) scale 0.4
 freeze zywoo_gameplay at 12s for 2s
 
 # Gameplay x Audio x Image x Resize
-cut "gameplay.mp4" from 37s to 47s as monesy_gameplay
+cut "gameplay.mp4" from 37s to 48s as monesy_gameplay
 overlay "background.mp3" fromAudio 25s forAudio 11s on monesy_gameplay fromVideo 0s forVideo 11s
 add "ohmygod.mp4" as ohmygod
 green screen ohmygod threshold 150
@@ -48,6 +49,7 @@ transition crossFadeOut on hop_on_rigole duration 2s
 
 # Shrek x Speedup x Audio x Resize
 add "shrek.mp4" as hrek
+transition fadeIn on hrek duration 2s
 accelerate hrek by 150%
 resize hrek to 640 x 360
 overlay "formula.mp3" on hrek
