@@ -395,7 +395,7 @@ public class ModelBuilder extends VideoMLBaseListener {
             int endSeconds    = startSeconds + lengthSeconds;
 
             audioClip.setStartTime(startVal);             
-            audioClip.setEndTime(endSeconds + "s");      
+            audioClip.setEndTime(endSeconds + "");
         }
 
         

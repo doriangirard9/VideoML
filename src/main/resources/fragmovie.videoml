@@ -1,6 +1,6 @@
 Project fragmovie at 24fps resolution 640 x 360
 
-# Intro
+# Intro x Explosions x Transitions
 add "intro.mp4" as intro
 caption "Fragmovie" on intro wait 2s for 8s as intro_text
 transition crossFadeIn on intro_text duration 2s
@@ -13,14 +13,37 @@ green screen explosion_right
 stack explosion_left on intro wait 5s at (left, bottom) scale 0.3
 stack explosion_right on intro wait 5s at (right, bottom) scale 0.3
 
-# Gameplay
+# Gameplay x The Rock x Freezing
 cut "gameplay.mp4" from 5s to 18s as zywoo_gameplay
 cut "therock.mp4" from 0s to 3s as therock_ok1
 cut "therock.mp4" from 0s to 3s as therock_ok2
-cut "therock.mp4" from 0s to 3s as therock_ok3
 cut "therock.mp4" from 3s to 4s as therock_nok
 
+green screen therock_ok1 threshold 100
+green screen therock_ok2 threshold 100
+green screen therock_nok threshold 100
 
-green screen therock_ok1
-stack therock_ok1 on zywoo_gameplay at (right, bottom) scale 0.3
+stack therock_ok1 on zywoo_gameplay wait 2s at (right, bottom) scale 0.4
+stack therock_ok2 on zywoo_gameplay wait 7s at (left, bottom) scale 0.4
+stack therock_nok on zywoo_gameplay wait 13s at (center, bottom) scale 0.4
 
+freeze zywoo_gameplay at 13s for 1s
+
+# Gameplay x Audio
+cut "gameplay.mp4" from 37s to 48s as monesy_gameplay
+overlay "background.mp3" fromAudio 25s forAudio 11s on monesy_gameplay fromVideo 0s forVideo 11s
+add "ohmygod.mp4" as ohmygod
+green screen ohmygod threshold 100
+stack ohmygod on monesy_gameplay wait 2s at (center, bottom)
+image "shocked.png" on monesy_gameplay wait 5s at (right, top) as shocked
+resize shocked to 50%
+
+# Caption for transition
+caption "Hop on rigole" for 5s as hop_on_rigole
+transition crossFadeIn on hop_on_rigole duration 2s
+transition crossFadeOut on hop_on_rigole duration 2s
+
+# Shrek x Speedup x Audio
+add "shrek.mp4" as hrek
+accelerate hrek by 150%
+overlay "formula.mp3" on hrek

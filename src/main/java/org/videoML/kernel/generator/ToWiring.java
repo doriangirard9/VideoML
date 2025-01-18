@@ -238,6 +238,16 @@ public class ToWiring extends Visitor<StringBuffer> {
         w(String.format("%s = %s.with_position(('%s', '%s'))\n",
                 cutVideoClip.getName(), cutVideoClip.getName(), cutVideoClip.getPositionX(), cutVideoClip.getPositionY()));
 
+        for (Map.Entry<String, String> entry : simpleAudioSnippets.entrySet()) {
+            System.out.println("Key in simple snippets: " + entry.getKey());
+            String audioName = entry.getKey();
+            String code = entry.getValue();
+            AudioClip audio = video.getAudioClip(audioName);
+            if (audio != null && audio.getAssociatedVideoClip() != null && audio.getAssociatedVideoClip().equals(cutVideoClip.getName())) {
+                w(code);
+            }
+        }
+
         w(String.format("%s_list.append(%s)\n", cutVideoClip.getParent(), cutVideoClip.getName()));
 
         if (setCurrentStart) {
