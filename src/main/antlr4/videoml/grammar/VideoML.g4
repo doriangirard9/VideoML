@@ -50,7 +50,7 @@ combine         : 'combine' variable ('and' variable)+ 'as' IDENTIFIER ;
 
 cut             : 'cut' variable 'from' time 'to' time ('as' name=IDENTIFIER)? ;
 
-stack           : 'stack' variable 'on' variable ('at' '(' position ',' position ')')? ('scale' FLOAT)? ;
+stack           : 'stack' variable 'on' variable ('wait' time)? ('at' '(' position ',' position ')')? ('scale' FLOAT)? ;
 
 preview         : 'preview' (IDENTIFIER)? ;
 

@@ -10,8 +10,8 @@ cut "explosion.mp4" from 0s to 3s as explosion_left
 cut "explosion.mp4" from 0s to 3s as explosion_right
 green screen explosion_left
 green screen explosion_right
-stack explosion_left on intro at (left, bottom) scale 0.3
-stack explosion_right on intro at (right, bottom) scale 0.3
+stack explosion_left on intro wait 5s at (left, bottom) scale 0.3
+stack explosion_right on intro wait 5s at (right, bottom) scale 0.3
 
 # Gameplay
 cut "gameplay.mp4" from 5s to 18s as zywoo_gameplay

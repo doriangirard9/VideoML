@@ -445,6 +445,12 @@ public class ModelBuilder extends VideoMLBaseListener {
         String position2 = ctx.position(1) != null ? ctx.position(1).getText() : "center";
         double scale = ctx.FLOAT() != null ? Double.parseDouble(ctx.FLOAT().getText()) : 1.0;
 
+        // delay
+        int delay = 0;
+        if (ctx.time() != null) {
+            delay = Integer.parseInt(ctx.time().getText().replace("s", ""));
+        }
+
         System.out.printf(
                 "Stacking clip: %s on %s at (%s, %s) with scale %f",
                 foregroundClip.getName(), backgroundClip.getName(), position1, position2, scale
@@ -453,7 +459,7 @@ public class ModelBuilder extends VideoMLBaseListener {
         foregroundClip.setPosition(position1, position2);
         Resize foregroundClipResize = new Resize(scale, foregroundClip.getName());
         foregroundClip.addEffect(foregroundClipResize);
-        foregroundClip.setStartTime(String.format("%s.start", backgroundClip.getName()));
+        foregroundClip.setStartTime(String.format("%s.start + %d", backgroundClip.getName(), delay));
     }
 
     @Override

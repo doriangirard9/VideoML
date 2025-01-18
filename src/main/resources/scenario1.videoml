@@ -1,7 +1,7 @@
-Project Holidays at 6fps
+Project Holidays
 
-caption "Paris, 20/12/2024" for 10s at (left, bottom)
+caption "Paris, 20/12/2024" for 10s
 
 add "first_clip.mov" and "second_clip.mp4"
 
-caption "Thanks for watching !" for 15s at (center, top)
+caption "Thanks for watching !" for 15s

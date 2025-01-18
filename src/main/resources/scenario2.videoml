@@ -2,12 +2,12 @@ Project Work
 
 caption "intro" for 10s
 
-cut "first_clip.mp4" from 10s to 35s as clip1a
+cut "first_clip.mp4" from 10s to 30s as clip1a
 cut "clip2.mp4" from 10s to 55s as clip1b
 
-caption "s1" on clip1a from 0s to 10s
-caption "s2" on clip1a 5s after "s1" for 10s
+caption "s1" on clip1a for 10s
+caption "s2" on clip1a wait 10s for 10s
 
-caption "s3" on clip1b 5s before clip1b for 15s
+caption "s3" on clip1b wait 5s for 15s
 
 caption "thanks" for 10s

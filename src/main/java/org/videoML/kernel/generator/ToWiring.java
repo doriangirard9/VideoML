@@ -65,6 +65,8 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(VideoClip videoClip) {
+        boolean setCurrentStart = (videoClip.getStartTime() != null) ? false : true;
+
         String startTime = (videoClip.getStartTime() != null) ? videoClip.getStartTime() : currentStart;
         w(String.format("%s = %s.with_start(%s)\n",
             videoClip.getName(), videoClip.getSource(), startTime));
@@ -103,7 +105,10 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w(String.format("%s_list.append(%s)\n", videoClip.getParent(), videoClip.getName()));
-        currentStart = String.format("%s.end", videoClip.getName());
+
+        if (setCurrentStart) {
+            currentStart = String.format("%s.end", videoClip.getName());
+        }
     }
 
     @Override
@@ -213,6 +218,8 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void visit(CutVideoClip cutVideoClip) {
+        boolean setCurrentStart = (cutVideoClip.getStartTime() != null) ? false : true;
+
         String startTime = (cutVideoClip.getStartTime() != null) ? cutVideoClip.getStartTime() : currentStart;
         w(String.format("%s = %s.subclipped(%s, %s).with_start(%s)\n",
                 cutVideoClip.getName(), cutVideoClip.getSource(),
@@ -227,7 +234,10 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w(String.format("%s_list.append(%s)\n", cutVideoClip.getParent(), cutVideoClip.getName()));
-        currentStart = String.format("%s.end", cutVideoClip.getName());
+
+        if (setCurrentStart) {
+            currentStart = String.format("%s.end", cutVideoClip.getName());
+        }
     }
 
     @Override
@@ -310,7 +320,6 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w(String.format("%s_list.append(%s)\n", compositeVideoClip.getParent(), compositeVideoClip.getName()));
-        currentStart = String.format("%s.end", compositeVideoClip.getName());
     }
 
     @Override
