@@ -244,10 +244,12 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w(String.format("%s = TextClip(text=\"%s\", font=font, font_size=48, color='white')"
-                + ".with_position('center')"
                 + ".with_start(%s)"
                 + ".with_duration(%s)\n",
                 textClip.getName(), textClip.getText(), startTime, duration));
+        
+        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
+                textClip.getName(), textClip.getName(), textClip.getPositionX(), textClip.getPositionY()));
 
         // Only update currentStart when textClip is standalone        
         if (textClip.getTargetClip() == null) {
@@ -276,10 +278,12 @@ public class ToWiring extends Visitor<StringBuffer> {
         }
 
         w(String.format("%s = ImageClip(\"%s\")"
-                + ".with_position('center')"
                 + ".with_start(%s)"
                 + ".with_duration(%s)\n",
                 imageClip.getName(), imageClip.getSource(), startTime, duration));
+
+        w(String.format("%s = %s.with_position(('%s', '%s'))\n",
+                imageClip.getName(), imageClip.getName(), imageClip.getPositionX(), imageClip.getPositionY()));
 
         // Only update currentStart when imageClip is standalone        
         if (imageClip.getTargetClip() == null) {

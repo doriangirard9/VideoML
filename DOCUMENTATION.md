@@ -40,6 +40,7 @@ Note that if you don't specify a clip, the caption will be added on a black scre
 - target ?: `VideoClip` = This will tie the caption to the clip
 - duration ?: `time` = The duration of the caption
 - offset ?: `time` = The offset of the caption
+- position ?: `(string, string)` = The position of the image on the screen
 
 **Examples**
 ```
@@ -52,8 +53,11 @@ caption "some text" on video_clip
 # Caption on a video clip with an offset
 caption "some text" on video_clip wait 2s
 
+# Caption on a video clip at a specific position
+caption "some text" on video_clip at (left, bottom)
+
 # Full example
-caption "some text" on video_clip wait 2s for 5s
+caption "some text" on video_clip wait 2s for 5s at (left, bottom)
 ```
 
 ## Image clips
@@ -66,6 +70,7 @@ You can add image clips to your project using the `image` keyword.
 - target ?: `VideoClip` = This will tie the image to the clip
 - duration ?: `time` = The duration of the image
 - offset ?: `time` = The offset of the image
+- position ?: `(string, string)` = The position of the image on the screen
 
 **Examples**
 ```
@@ -78,8 +83,11 @@ image "image.png" on video_clip
 # Image on a video clip with an offset
 image "image.png" on video_clip wait 2s
 
+# Image on a video clip at a specific position
+image "image.png" on video_clip at (left, bottom)
+
 # Full example
-image "image.png" on video_clip wait 2s for 5s
+image "image.png" on video_clip wait 2s for 5s at (left, bottom)
 ```
 
 ## Video clips

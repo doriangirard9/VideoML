@@ -38,9 +38,9 @@ add             : 'add' video ('and' video)* ;
 
 video           : STRING ('as' IDENTIFIER)? ;
 
-caption         : 'caption' STRING (offset | duration) ('as' IDENTIFIER)? ;
+caption         : 'caption' STRING (offset | duration) ('at' '(' position ',' position ')')? ('as' IDENTIFIER)? ;
 
-image           : 'image' STRING (offset | duration) ('as' IDENTIFIER)? ;
+image           : 'image' STRING (offset | duration) ('at' '(' position ',' position ')')? ('as' IDENTIFIER)? ;
 
 offset          : 'on' variable ('wait' time)? (duration)? ;
 
@@ -98,4 +98,4 @@ NEWLINE         : ('\r'? '\n' | '\r')+      -> skip;
 WS              : ((' ' | '\t')+)           -> skip;
 COMMENT         : '#' ~( '\r' | '\n' )*     -> skip;
 DIGIT           : [0-9] ;
-position        : 'top' | 'bottom' | 'left' | 'right' ;
+position        : 'top' | 'bottom' | 'left' | 'right' | 'center' ;

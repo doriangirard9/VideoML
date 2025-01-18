@@ -176,6 +176,10 @@ public class ModelBuilder extends VideoMLBaseListener {
             caption.setDuration(duration);
         }
 
+        String position1 = ctx.position(0) != null ? ctx.position(0).getText() : "center";
+        String position2 = ctx.position(1) != null ? ctx.position(1).getText() : "center";
+        caption.setPosition(position1, position2);
+
         System.out.printf(
                 "Adding caption %s: %s on clip %s with %d seconds delay and for %d seconds\n",
                 clipName, text, caption.getTargetClip(), caption.getDelay(), caption.getDuration()
@@ -228,6 +232,10 @@ public class ModelBuilder extends VideoMLBaseListener {
             int duration = Integer.parseInt(ctx.duration().time().getText().replace("s", ""));
             imageClip.setDuration(duration);
         }
+
+        String position1 = ctx.position(0) != null ? ctx.position(0).getText() : "center";
+        String position2 = ctx.position(1) != null ? ctx.position(1).getText() : "center";
+        imageClip.setPosition(position1, position2);
 
         System.out.printf(
                 "Adding image %s with path %s on clip %s with %d seconds delay and for %d seconds\n",
@@ -392,7 +400,6 @@ public class ModelBuilder extends VideoMLBaseListener {
             audioClip.setOnOverlayEnd(targetVideoClip.getName() + ".end");
         }
     }
-
     
     @Override
     public void enterStack(VideoMLParser.StackContext ctx) {
