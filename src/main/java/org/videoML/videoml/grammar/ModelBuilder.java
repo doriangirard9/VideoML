@@ -319,20 +319,29 @@ public class ModelBuilder extends VideoMLBaseListener {
 
     @Override
     public void enterAdjustVolume(VideoMLParser.AdjustVolumeContext ctx) {
+        boolean hasSetVolume = false;
         String audioClipPath = ctx.variable().STRING().getText().replace("\"", "").trim();
         int volume = Integer.parseInt(ctx.percentage().getText().replace("%", ""));
         
         for (int i = 0; i < video.getTimeline().size(); i++) {
             if (video.getTimeline().get(i) instanceof AudioClip) {
                 AudioClip audioClip = (AudioClip) video.getTimeline().get(i);
-                if (audioClip.getPath() != null){
+                if (audioClip.getPath() != null) {
                     if (audioClip.getPath().equals(audioClipPath)) {
                         audioClip.setVolume(volume / 100.0);
-                        return; 
+                        hasSetVolume = true;
+                        break;
                     }
                 }
             }
         }
+
+        if (!hasSetVolume) {
+            RuntimeException e = new RuntimeException("Audio clip not found: " + audioClipPath + ". Cannot adjust volume.");
+            e.setStackTrace(new StackTraceElement[0]);
+            throw e;
+        }
+
         System.out.printf("Adjusting volume of clip %s to %f%n", audioClipPath, volume);
     }
 
@@ -405,7 +414,7 @@ public class ModelBuilder extends VideoMLBaseListener {
             audioClip.setOnOverlayEnd(targetVideoClip.getName() + ".end");
         }
     }
-    
+
     @Override
     public void enterStack(VideoMLParser.StackContext ctx) {
         // background clip
