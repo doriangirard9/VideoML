@@ -1,6 +1,6 @@
 package org.videoML.videoml.grammar.exceptions;
 
-import org.videoML.kernel.clips.VideoExtension;
+import org.videoML.kernel.clips.video.VideoExtension;
 
 import java.util.Arrays;
 

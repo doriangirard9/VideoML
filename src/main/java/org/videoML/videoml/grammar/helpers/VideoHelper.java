@@ -4,7 +4,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.mp4.MP4Parser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.videoML.kernel.clips.VideoExtension;
+import org.videoML.kernel.clips.video.VideoExtension;
 
 import java.io.FileInputStream;
 

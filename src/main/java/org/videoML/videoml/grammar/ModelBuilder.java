@@ -7,9 +7,11 @@ import org.videoML.kernel.Video;
 import org.videoML.kernel.clips.video.*;
 import org.videoML.kernel.effects.video.*;
 
+import org.videoML.videoml.grammar.exceptions.AudioExtensionException;
 import org.videoML.videoml.grammar.exceptions.PreviewException;
 import org.videoML.videoml.grammar.exceptions.VideoExtensionException;
 import org.videoML.videoml.grammar.exceptions.VideoTimeException;
+import org.videoML.videoml.grammar.helpers.AudioHelper;
 import org.videoML.videoml.grammar.helpers.VideoHelper;
 import org.videoML.kernel.clips.video.CompositeVideoClip;
 import org.videoML.kernel.clips.video.CutVideoClip;
@@ -35,6 +37,10 @@ public class ModelBuilder extends VideoMLBaseListener {
     }
 
     private String getAudioClipNameFromPath(String path) {
+        if (!AudioHelper.isValidExtension(path)) {
+            throw new AudioExtensionException(AudioExtensionException.buildMessage(path));
+        }
+
         return String.format("AudioFileClip(\"%s\")", path);
     }
 
@@ -252,7 +258,7 @@ public class ModelBuilder extends VideoMLBaseListener {
         // Check if the first clip is an audio clip
         if (ctx.variable(0).STRING() != null) {
             String firstClipPath = ctx.variable(0).STRING().getText().replace("\"", "");
-            if (firstClipPath.endsWith(".mp3")) {
+            if (AudioHelper.isValidExtension(firstClipPath)) {
                 isAudio = true;
             }
         }
@@ -276,8 +282,7 @@ public class ModelBuilder extends VideoMLBaseListener {
             }
             video.addCombineClip(compositeClipName);
             video.addTimelineElement(compositeClip);
-        }
-        else {
+        } else {
             CompositeAudioClip compositeClip = new CompositeAudioClip(compositeClipName);
             String clipNameGenerated;
             List<String> clipNames = new ArrayList<>();

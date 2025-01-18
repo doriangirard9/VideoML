@@ -3,7 +3,7 @@ Project Sound
 combine "explanation1.mp3" and "explanation2.mp3" as explanations
 
 overlay explanations fromAudio 0s forAudio 10s on "first_clip.mp4" fromVideo 3s forVideo 10s
-overlay "explanation3.mp3" on "second_clip.mp4" 
+overlay "explanation3.mp3" on "second_clip.mp4"
 
 adjust volume of "explanation1.mp3" to 50%
 adjust volume of "explanation2.mp3" to 100%
