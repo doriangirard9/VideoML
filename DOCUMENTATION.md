@@ -285,7 +285,7 @@ Concatenate audio clips using the same keyword as for video clips `combine`. Thi
 multiple audio chunks together and apply effects on it.
 
 **Parameters**
-- audioName : `string` or `AudioClip` = The name can be a path to a file or an audio clip object
+- audioName : `string` or `AudioClip` = The name can be a path to a file or an AudioClip object
 - resultVariable : `string`
 
 **Examples** 
@@ -299,8 +299,8 @@ combine "audio1.mp3" and "audio2.mp3" as combined_result
 
 You can overlay audio clips onto your videos using the `overlay` keyword.
 Two scenarios are possible:
-  - with timestamp provided for the audio and where exactly the audio needs to be placed on video
-  - without timestamp where the audio is placed from the start of the video till the end (if it is longer than the total time of the video, it will not be overlayed on the next video)
+  - with timestamp provided: 1)For the audio cut 2) Where exactly the audio needs to be placed on video 
+  - without timestamp: the audio is placed from the start of the video till the end (if it is longer than the total time of the video, it will not be overlayed on the next video; if it is smaller than the total time of the video - it will stops after reaching its finish)
 
 **Parameters**
 - audioFile: `string` = Path to the audio file (.mp3 or .wav).
@@ -325,7 +325,7 @@ Adjust the volume of an audio file using the `adjust volume` keyword.
 
 **Parameters**
 - audioFile: `string`
-- volume: `int`
+- volume: `int` + % (absolute position of the volume)
 
 **Examples**
 ```
