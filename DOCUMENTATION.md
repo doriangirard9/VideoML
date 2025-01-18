@@ -38,14 +38,48 @@ Note that if you don't specify a clip, the caption will be added on a black scre
 - text : `string`
 - clip ?: `VideoClip`
 - target ?: `VideoClip` = This will tie the caption to the clip
+- duration ?: `time` = The duration of the caption
+- offset ?: `time` = The offset of the caption
 
 **Examples**
 ```
-# Caption on a black screen
-caption "some text"
+# Caption on a black screen for 10s
+caption "some text" for 10s
 
 # Caption on a video clip
 caption "some text" on video_clip
+
+# Caption on a video clip with an offset
+caption "some text" on video_clip wait 2s
+
+# Full example
+caption "some text" on video_clip wait 2s for 5s
+```
+
+## Image clips
+
+You can add image clips to your project using the `image` keyword.
+
+**Parameters**
+- name : `string` = The path to the image file (.png or .jpg)
+- clip ?: `VideoClip`
+- target ?: `VideoClip` = This will tie the image to the clip
+- duration ?: `time` = The duration of the image
+- offset ?: `time` = The offset of the image
+
+**Examples**
+```
+# Image on a black screen for 10s
+image "image.png" for 10s
+
+# Image on a video clip
+image "image.png" on video_clip
+
+# Image on a video clip with an offset
+image "image.png" on video_clip wait 2s
+
+# Full example
+image "image.png" on video_clip wait 2s for 5s
 ```
 
 ## Video clips
@@ -62,7 +96,14 @@ Note that the order of the video clips in the project is the order in which they
 
 **Examples**
 ```
-add "video1" and "video2" and ...
+# Adding multiple video clips
+add "video1.mp4" and "video2.mp4" and ...
+
+# Adding and naming a video clip
+add "video1.mp4" as video_clip1
+
+# Full example
+add "video1.mp4" as video_clip1 and "video2.mp4" as video_clip2
 ```
 
 ### Cutting a video clip
@@ -76,6 +117,9 @@ You can cut a video clip using the `cut` keyword.
 **Examples**
 ```
 cut video_clip1 from 10s to 15s
+
+# Full example
+cut video_clip1 from 10s to 15s as new_clip
 ```
 
 ### Concatenating video clips
@@ -102,34 +146,16 @@ You can stack video clips using the `stack` keyword.
 **Examples**
 ```
 # Stack a video clip on another
-stack "name1" on "name2"
+stack "name1.mp4" on "name2.mp4"
 
 # Stack a video clip on another at a specific position
-stack "name1" on "name2" at position
+stack "name1.mp4" on "name2.mp4" at (left, bottom)
 
 # Stack a video clip on another with a new scale
-stack "name1" on "name2" scale newScale
-```
+stack "name1.mp4" on "name2.mp4" scale 0.5
 
-## Timings
-only for texts and images
-```
-# Duration
-... for 10s
-
-# Absolute time
-... from 2s to 10s
-
-# Offset time
-... 3s after some_clip
-... 3s before some_clip
-```
-
-## Naming
-Naming a clip allows you to reference it later in the project.
-```
-# Named clip
-... as some_name
+# Full example
+stack "name1.mp4" on "name2.mp4" at (left, bottom) scale 0.5
 ```
 
 ## Video Effects
