@@ -265,7 +265,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
             // if duration is unset the text will sync with the target clip
             if (textClip.getDuration() == 0)
-                duration = String.format("%s.start + %s.end - %d", textClip.getTargetClip(), textClip.getTargetClip(), textClip.getDelay());
+                duration = String.format("%s.end - %s.start - %d", textClip.getTargetClip(), textClip.getTargetClip(), textClip.getDelay());
         }
 
         w(String.format("%s = TextClip(text=\"%s\", font=font, font_size=48, color='white')"
@@ -298,7 +298,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
             // if duration is unset the image will sync with the target clip
             if (imageClip.getDuration() == 0)
-                duration = String.format("%s.start + %s.end - %d", 
+                duration = String.format("%s.end - %s.start - %d", 
                     imageClip.getTargetClip(), imageClip.getTargetClip(), imageClip.getDelay());
         }
 
