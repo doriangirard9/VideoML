@@ -279,17 +279,41 @@ green screen some_clip threshold 150
 ---
 
 ## Audio Clips
+
+## Concatenating audio clips
+Concatenate audio clips using the same keyword as for video clips `combine`. This helps to put together
+multiple audio chunks together and apply effects on it.
+
+**Parameters**
+- audioName : `string` or `AudioClip` = The name can be a path to a file or an audio clip object
+- resultVariable : `string`
+
+**Examples** 
+```
+combine "audio1.mp3" and "audio2.mp3" as combined_result
+```
+
+---
+
+## Audio Overlay
+
 You can overlay audio clips onto your videos using the `overlay` keyword.
+Two scenarios are possible:
+  - with timestamp provided for the audio and where exactly the audio needs to be placed on video
+  - without timestamp where the audio is placed from the start of the video till the end (if it is longer than the total time of the video, it will not be overlayed on the next video)
 
 **Parameters**
 - audioFile: `string` = Path to the audio file (.mp3 or .wav).
-- clipName: `string` or `VideoClip`
+- targetClipName: `string` or `VideoClip`
 - timestamp: `TIME`
 
 **Examples**
 ```
-# Overlay audio at a specific timestamp
-overlay "audio.mp3" on some_clip at 00:00:10
+# Overlay audio at a specific timestamp positionned at some time in the video
+overlay "audio.mp3" fromAudio 0s forAudio 10s on some_clip fromVideo 3s forVideo 10s
+
+# Overlay audio without timestamps
+overlay audio on some_clip
 ```
 
 ---
@@ -306,5 +330,5 @@ Adjust the volume of an audio file using the `adjust volume` keyword.
 **Examples**
 ```
 # Set volume to 80
-adjust volume of "audio.mp3" to 80
+adjust volume of "audio.mp3" to 80%
 ```

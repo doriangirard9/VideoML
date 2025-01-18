@@ -1,3 +1,4 @@
+
 package org.videoML.kernel.generator;
 
 import java.util.LinkedHashMap;
@@ -137,8 +138,8 @@ public class ToWiring extends Visitor<StringBuffer> {
                 audioClip.getSource(),
                 subclipStart,
                 subclipEnd,
-                audioClip.getPreceededBy(),
-                audioClip.getEndTime(),
+                audioClip.getOnOverlayStart(),
+                audioClip.getOnOverlayEnd(),
                 volume
             ));
         }
