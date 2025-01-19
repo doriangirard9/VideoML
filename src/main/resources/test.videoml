@@ -1,8 +1,0 @@
-Project stacking at 12fps
-
-add "second_clip.mp4" as clip1
-add "explosion.mp4" as effect
-resize effect to 200%
-stack effect on clip1
-green screen effect
-preview

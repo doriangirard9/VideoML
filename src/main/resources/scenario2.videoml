@@ -1,8 +1,8 @@
-Project Work
+Project Work at 24fps
 
 caption "intro" for 10s
 
-cut "first_clip.mp4" from 10s to 30s as clip1a
+cut "first_clip.mov" from 10s to 30s as clip1a
 cut "clip2.mp4" from 10s to 55s as clip1b
 
 caption "s1" on clip1a for 10s

@@ -1,6 +1,0 @@
-Project Sport
-
-stack "first_clip.mp4" on "second_clip.mp4" at (left, bottom) scale 0.2 as commentary
-
-transition "fadeIn" on commentary duration 2s
-transition "fadeOut" on commentary duration 2s

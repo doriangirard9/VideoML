@@ -26,7 +26,7 @@ You can find examples in the `src/main/resources` folder or you can read the [do
 Run it with the scenario (an existing `.videoml` file in the `src/main/resources` folder) you want to test:
 
 ```bash
-./run.sh scenario1 --build
+./run.sh fragmovie --build
 ```
 
 The first time you run the script, you need to build the project with the `--build` flag. This will compile the ANTLR grammar and build the project.
@@ -42,12 +42,12 @@ mvn clean package
 
 Run the compiler using the `exec` plugin:
 ```bash
-mvn exec:java -Dexec.args="src/main/resources/test.videoml"
+mvn exec:java -Dexec.args="src/main/resources/fragmovie.videoml"
 ```
 
 Run the python script to generate the video:
 ```bash
 cd src/main/resources
-python3 test.py
+python3 fragmovie.py
 ```
 

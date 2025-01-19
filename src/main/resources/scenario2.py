@@ -12,7 +12,7 @@ final_clip_list = []
 AUTO_GENERATED_CLIP_0 = TextClip(text="intro", font=font, font_size=48, color='white').with_start(0).with_duration(10)
 AUTO_GENERATED_CLIP_0 = AUTO_GENERATED_CLIP_0.with_position(('center', 'center'))
 final_clip_list.append(AUTO_GENERATED_CLIP_0)
-clip1a = VideoFileClip("first_clip.mp4").subclipped(10, 30)
+clip1a = VideoFileClip("first_clip.mov").subclipped(10, 30)
 clip1a = clip1a.with_start(AUTO_GENERATED_CLIP_0.end)
 clip1a = clip1a.with_position(('center', 'center'))
 final_clip_list.append(clip1a)
